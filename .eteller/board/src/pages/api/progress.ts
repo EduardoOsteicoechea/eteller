@@ -47,17 +47,33 @@ function parseMeta(md: string): Record<string, string> {
   return out;
 }
 
-function parseMilestones(md: string): { done: boolean; text: string }[] {
-  const section =
-    md.split(/##\s*Milestones/i)[1] ||
-    md.split(/##\s*Subtareas/i)[1] ||
-    '';
+function parseStateTable(md: string): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const line of md.split(/\r?\n/)) {
+    const m = line.match(/^\|\s*([a-z_]+)\s*\|\s*`?([^`|]*)`?\s*\|/i);
+    if (m) out[m[1].toLowerCase()] = m[2].trim();
+  }
+  return out;
+}
+
+function parseCheckboxLines(text: string): { done: boolean; text: string }[] {
   const subs: { done: boolean; text: string }[] = [];
-  for (const line of section.split(/\r?\n/)) {
+  for (const line of text.split(/\r?\n/)) {
     const m = line.match(/^\s*-\s*\[([ xX])\]\s+(.+)$/);
     if (m) subs.push({ done: m[1].toLowerCase() === 'x', text: m[2].trim() });
   }
   return subs;
+}
+
+function parseMilestones(md: string): { done: boolean; text: string }[] {
+  const afterHeading =
+    md.split(/##\s*Milestones/i)[1] ||
+    md.split(/##\s*Subtareas/i)[1] ||
+    '';
+  // Prefer section under heading; if missing/empty, scan whole file (agents often omit the heading).
+  const fromSection = afterHeading ? parseCheckboxLines(afterHeading) : [];
+  if (fromSection.length > 0) return fromSection;
+  return parseCheckboxLines(md);
 }
 
 function listWaveDirs(wavesRoot: string): string[] {
@@ -67,6 +83,26 @@ function listWaveDirs(wavesRoot: string): string[] {
     .filter((d) => d.isDirectory() && d.name.startsWith('wave-'))
     .map((d) => d.name)
     .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+}
+
+function fileMtime(p: string | undefined): string {
+  if (!p || !fs.existsSync(p)) return '';
+  try {
+    return fs.statSync(p).mtime.toISOString();
+  } catch {
+    return '';
+  }
+}
+
+function mergeStatus(
+  progressMeta: Record<string, string>,
+  stateMeta: Record<string, string>,
+): string {
+  const finished = (stateMeta.finished || '').toLowerCase() === 'true';
+  const stateStatus = (stateMeta.status || '').toLowerCase();
+  if (finished || stateStatus === 'closed') return 'closed';
+  if (stateStatus === 'blocked' || stateStatus === 'blocked_client') return stateStatus;
+  return progressMeta.status || stateStatus || 'pending';
 }
 
 export const GET: APIRoute = async () => {
@@ -96,6 +132,7 @@ export const GET: APIRoute = async () => {
       progressMd: string;
       meta: Record<string, string>;
       milestones: { done: boolean; text: string }[];
+      mtime: string;
     }[];
   }[] = [];
 
@@ -130,32 +167,54 @@ export const GET: APIRoute = async () => {
       }
 
       const etellerDir = clonePath ? path.join(clonePath, '.eteller') : '';
-      const read = (name: string) => {
-        if (!etellerDir) return '';
-        const p = path.join(etellerDir, name);
-        return fs.existsSync(p) ? fs.readFileSync(p, 'utf8') : '';
-      };
+      const progressPath = etellerDir ? path.join(etellerDir, 'progress.md') : '';
+      const statePath = etellerDir ? path.join(etellerDir, 'state.md') : '';
+      const taskPath = etellerDir ? path.join(etellerDir, 'task.md') : '';
 
-      const progressMd = read('progress.md');
-      const taskMd = read('task.md');
-      const stateMd = read('state.md');
-      const meta = parseMeta(progressMd);
+      const read = (p: string) =>
+        p && fs.existsSync(p) ? fs.readFileSync(p, 'utf8') : '';
+
+      const progressMd = read(progressPath);
+      const taskMd = read(taskPath);
+      const stateMd = read(statePath);
+      const progressMeta = parseMeta(progressMd);
+      const stateMeta = parseStateTable(stateMd);
+      const milestones = parseMilestones(progressMd);
+
+      const meta: Record<string, string> = { ...progressMeta };
       if (!meta.ticket) meta.ticket = taskId;
       if (!meta.wave) meta.wave = waveId;
+      if (!meta.branch) meta.branch = stateMeta.branch || taskId;
+      meta.status = mergeStatus(progressMeta, stateMeta);
+      if (stateMeta.pr_url && !meta.pr_status) meta.pr_status = stateMeta.pr_url;
+
+      const doneCount = milestones.filter((m) => m.done).length;
+      if ((!meta.percent || meta.percent === '0') && milestones.length > 0 && doneCount > 0) {
+        meta.percent = String(Math.round((doneCount / milestones.length) * 100));
+      }
+      if (!meta.percent) meta.percent = '0';
+
+      const mtime = [fileMtime(progressPath), fileMtime(statePath)]
+        .filter(Boolean)
+        .sort()
+        .at(-1) || '';
+
+      if (!meta.updated && mtime) meta.updated = mtime;
 
       tasks.push({
         id: taskId,
         paths: {
           clone: clonePath || undefined,
-          task: etellerDir ? path.join(etellerDir, 'task.md') : undefined,
-          state: etellerDir ? path.join(etellerDir, 'state.md') : undefined,
-          progress: etellerDir ? path.join(etellerDir, 'progress.md') : undefined,
+          task: taskPath || undefined,
+          state: statePath || undefined,
+          progress: progressPath || undefined,
         },
         taskMd,
         stateMd,
         progressMd,
         meta,
-        milestones: parseMilestones(progressMd),
+        milestones,
+        mtime,
       });
     }
 
@@ -172,7 +231,8 @@ export const GET: APIRoute = async () => {
     {
       headers: {
         'Content-Type': 'application/json',
-        'Cache-Control': 'no-store',
+        'Cache-Control': 'no-store, no-cache, must-revalidate',
+        Pragma: 'no-cache',
       },
     },
   );

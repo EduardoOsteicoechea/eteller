@@ -76,7 +76,7 @@ function Seed-TaskEteller([string]$clonePath, [string]$taskId, [string]$wave, [s
     $cloneEteller = Join-Path $clonePath '.eteller'
     $templates = Join-Path $FrameworkRoot 'templates\task\.eteller'
     New-Item -ItemType Directory -Force -Path $cloneEteller | Out-Null
-    foreach ($name in @('task.md', 'state.md', 'progress.md')) {
+    foreach ($name in @('task.md', 'state.md', 'progress.md', 'for_review.md', 'approved.md')) {
         $dest = Join-Path $cloneEteller $name
         if (Test-Path $dest) { continue }
         $src = Join-Path $templates $name

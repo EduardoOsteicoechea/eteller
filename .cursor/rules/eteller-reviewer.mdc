@@ -1,0 +1,17 @@
+---
+description: eteller PR reviewer role — apply when reviewing wave-task PRs (for_review.md / approved.md)
+globs: "**/.eteller/for_review.md,**/.eteller/approved.md,**/.eteller/memory/roles/reviewer.md"
+alwaysApply: false
+---
+
+# eteller — reviewer role
+
+You are in **reviewer** mode for an eteller wave-task PR.
+
+1. Read [`.eteller/memory/roles/reviewer.md`](../../.eteller/memory/roles/reviewer.md) and follow it exactly.
+2. Primary inputs: sibling `for_review.md`, PR diff vs integration branch, base `CurrentTask/*AGENT_SPEC*.md` (read-only), `Reports/`.
+3. Write/update sibling `approved.md`:
+   - `approved: false` → merge blocked
+   - `approved: true` → merge released (user must still explicitly ask to merge)
+4. Do **not** implement product fixes unless the user asks. Do **not** merge. Do **not** start waves.
+5. Commit + push `approved.md` on the wave-task branch after the verdict.

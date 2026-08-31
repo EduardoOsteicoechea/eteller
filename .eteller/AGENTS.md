@@ -25,8 +25,9 @@ Read, in this order:
 | Campaign goal / waves / tasks / branch names | **User story only** (after base; never invent from PROMPTs or AGENT_SPEC maps) |
 | When a wave may start | **Explicit user request** for that wave id (never auto-start) |
 | Product coding criteria | `base/<repo>/CurrentTask/*AGENT_SPEC*.md` (read-only) |
-| Campaign / wave / task progress | Product branches under clone `.eteller/` |
+| Campaign / wave / task progress | Product branches under clone `.eteller/` (`progress.md` after **each** milestone) |
 | Work-session prompt history / reporting | `base/<repo>/.eteller/history/` + `worksession.txt` (integration branch) |
+| Live board | `.eteller/board` → polls clone `progress.md` / `state.md` |
 
 ## Hard stops
 
@@ -36,3 +37,13 @@ Read, in this order:
 On every material work-session prompt/steer change: append `history/YYYYMMDDTHHMMSSZ.md` and update `worksession.txt` (see [`memory/history.md`](memory/history.md)). Commit on the integration branch.
 
 Never invent a second coding law. Never auto-merge wave-task PRs.
+
+## Merge gate (code review)
+
+Before any merge of a wave-task PR:
+
+1. Implementer wrote `.eteller/for_review.md` on the task branch
+2. A **reviewer**-role agent wrote `.eteller/approved.md` with `approved: true`
+3. User explicitly asked to merge
+
+Role contract: [`memory/roles/reviewer.md`](memory/roles/reviewer.md). Implementers must not self-approve.

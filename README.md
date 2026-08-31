@@ -16,6 +16,7 @@ Framework wiring lives under **`.eteller/`**. Product clones are generated at th
 - Tracks campaign/wave/task state in product-owned `.eteller/` docs inside those clones
 - Serves a live progress board from `.eteller/board/`
 - Enforces a single coding law from the base branch agent spec
+- **Code-review gate before merge:** implementer writes `for_review.md`; reviewer agents (role `.eteller/memory/roles/reviewer.md`) set `approved.md`; merge only on your ask + `approved: true`
 
 The clone directory name is always the **repository basename** from `REPO_URL` (no separate config field).
 
@@ -59,6 +60,8 @@ base/<repo>/                 # integration branch (at root)
   .eteller/worksession.txt     # rolling report for automation
 waves/wave-N/<task-id>/<repo>/
   .eteller/task.md|state.md|progress.md
+  .eteller/for_review.md      # implementer → reviewers
+  .eteller/approved.md        # reviewer gate (blocks/releases merge)
   Reports/<task-id>.txt
 ```
 
@@ -69,6 +72,7 @@ waves/wave-N/<task-id>/<repo>/
 - Coding criteria: base `CurrentTask` agent spec only (how to code — not what to invent)
 - Each material work-session prompt/steer → `base/.../.eteller/history/` + update `worksession.txt` (commit on integration)
 - Milestones: update clone `.eteller/progress.md`, commit on the wave-task branch
-- Task complete: Reports → open PR → mark closed — **never auto-merge**
+- Task complete: Reports → `for_review.md` → open PR → review (`approved.md`) → **merge only on ask + approved**
+- Reviewer role: `.eteller/memory/roles/reviewer.md` (only agents you assign to review)
 - Framework changes under `.eteller/`: commit and push to the eteller remote
 - Never commit `base/` or `waves/` into eteller

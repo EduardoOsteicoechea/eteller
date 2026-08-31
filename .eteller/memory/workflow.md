@@ -49,16 +49,28 @@ Record each “start wave-N” steer in `history/` + `worksession.txt`.
 5. **Branches** — exact names the user dictates (match naming criteria). Create/push only after Plan is agreed.
 6. **Materialize** — `waves/wave-N/<task-id>/<repo>/` at root; seed clone `.eteller/` from `.eteller/templates/` if missing. Re-run bootstrap only after open tasks exist in orchestration. Materialize ≠ start work.
 7. **STOP — ask before each wave** — after materialize (and after each wave completes), ask which wave to start; do not enter Work until the user names that wave.
-8. **Work** — only for the user-started wave: code in that clone; follow **base** AGENT_SPEC; update clone `.eteller/progress.md` on milestones; commit on wave-task branch.
-9. **Close** — Reports → open PR → `state.md` closed. **Do not merge** unless user asks. Record the steer in base history + `worksession.txt`. Then **STOP** and ask before the next wave.
-10. **Refresh base** — after merge, pull base; refresh `worksession.txt`.
+8. **Work** — only for the user-started wave: code in that clone; follow **base** AGENT_SPEC. **After every milestone/segment**, update clone `.eteller/progress.md` (`[x]`, `percent`, `current_task`, `status`, `updated`) **before** starting the next segment so the live board (`board/` → `:4321`) can poll it; then commit on the wave-task branch.
+9. **Close (PR + review packet)** — Reports → write clone `.eteller/for_review.md` (in-depth PR explanation) → ensure `.eteller/approved.md` exists with `approved: false` → open PR → set `state.md` to `awaiting_review` (not mergeable yet). **Do not merge.** Record steer in base `history/` + `worksession.txt`.
+10. **Code review (hard gate before merge)** — user launches **reviewer** subagents (`model: "cursor-grok-4.5-high"`) with role [roles/reviewer.md](roles/reviewer.md). Each reviewer reads that PR’s `for_review.md` + diff and writes `approved.md` (`approved: true|false`). Commit `approved.md` on the wave-task branch.
+11. **Merge** — only if **all** of: user explicitly asks to merge; `approved.md` has `approved: true`; PR targets `INTEGRATION_BRANCH`. Never auto-merge. Never merge on implementer say-so alone.
+12. **STOP — ask before next wave** — after wave close/merge cycle, ask before the next wave.
+13. **Refresh base** — after merge, pull base; refresh `worksession.txt`.
 
 ## Models
 
-Task subagents: always `model: "cursor-grok-4.5-high"`.
+Task / reviewer subagents: always `model: "cursor-grok-4.5-high"`.
+
+## Roles
+
+| Role | When | Attitude source |
+|------|------|-----------------|
+| Orchestrator / implementer | Plan, code, Reports, `for_review.md` | `.eteller/AGENTS.md` + this workflow |
+| **Reviewer** | User sends agent to review a PR | [`.eteller/memory/roles/reviewer.md`](roles/reviewer.md) (+ Cursor rule `eteller-reviewer` when `for_review.md` / `approved.md` are in scope) |
+
+Reviewer agents must **not** code product features or merge. Implementers must **not** set `approved: true` on their own PR.
 
 ## Commits
 
 - Framework (`.eteller/` wiring, root README/thin AGENTS/rules) → **eteller** remote
-- Clone `.eteller/progress|task|state` → **wave-task branch**
+- Clone `.eteller/progress|task|state|for_review|approved` → **wave-task branch**
 - Base `orchestration.md` / `wave_plan.md` / `history/` / `worksession.txt` → **integration branch**

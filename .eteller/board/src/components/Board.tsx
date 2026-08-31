@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 type Milestone = { done: boolean; text: string };
 
@@ -7,6 +7,7 @@ type TaskCard = {
   meta: Record<string, string>;
   milestones: Milestone[];
   paths: { clone?: string };
+  mtime?: string;
 };
 
 type Wave = {
@@ -22,12 +23,14 @@ type Payload = {
   waves: Wave[];
 };
 
+const POLL_MS = 1500;
+
 function badgeClass(status: string) {
   const s = (status || 'idle').toLowerCase();
   if (s === 'done' || s === 'closed') return 'done';
   if (s === 'merged') return 'merged';
-  if (s === 'blocked') return 'blocked';
-  if (s === 'in_progress' || s === 'active') return 'in_progress';
+  if (s === 'blocked' || s === 'blocked_client') return 'blocked';
+  if (s === 'in_progress' || s === 'active' || s === 'ready_for_pr') return 'in_progress';
   return 'idle';
 }
 
@@ -38,10 +41,28 @@ function isMerged(meta: Record<string, string>) {
   return status === 'merged' || pr === 'merged' || /merged/i.test(phase);
 }
 
+function fingerprint(data: Payload): string {
+  return data.waves
+    .map((w) =>
+      w.tasks
+        .map(
+          (t) =>
+            `${t.id}:${t.meta.status}:${t.meta.percent}:${t.meta.current_task}:${t.mtime}:${t.milestones
+              .map((m) => (m.done ? '1' : '0'))
+              .join('')}`,
+        )
+        .join('|'),
+    )
+    .join('/');
+}
+
 export default function Board() {
   const [data, setData] = useState<Payload | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [conn, setConn] = useState('connecting…');
+  const [flashIds, setFlashIds] = useState<Set<string>>(new Set());
+  const prevFp = useRef<string>('');
+  const prevTasks = useRef<Map<string, string>>(new Map());
 
   useEffect(() => {
     let alive = true;
@@ -51,9 +72,36 @@ export default function Board() {
         if (!res.ok) throw new Error(`API ${res.status}`);
         const json = (await res.json()) as Payload;
         if (!alive) return;
+
+        const next = new Map<string, string>();
+        const changed = new Set<string>();
+        for (const wave of json.waves) {
+          for (const task of wave.tasks) {
+            const key = `${wave.id}/${task.id}`;
+            const sig = `${task.meta.status}|${task.meta.percent}|${task.meta.current_task}|${task.mtime}|${task.milestones
+              .map((m) => (m.done ? '1' : '0') + m.text)
+              .join(';')}`;
+            next.set(key, sig);
+            const old = prevTasks.current.get(key);
+            if (old !== undefined && old !== sig) changed.add(task.id);
+          }
+        }
+        prevTasks.current = next;
+
+        const fp = fingerprint(json);
+        if (fp !== prevFp.current) {
+          prevFp.current = fp;
+          if (changed.size > 0) {
+            setFlashIds(changed);
+            window.setTimeout(() => {
+              if (alive) setFlashIds(new Set());
+            }, 1800);
+          }
+        }
+
         setData(json);
         setError(null);
-        setConn('ok');
+        setConn('live');
       } catch (e) {
         if (!alive) return;
         setError(e instanceof Error ? e.message : String(e));
@@ -61,7 +109,7 @@ export default function Board() {
       }
     };
     refresh();
-    const id = setInterval(refresh, 5000);
+    const id = setInterval(refresh, POLL_MS);
     return () => {
       alive = false;
       clearInterval(id);
@@ -73,9 +121,9 @@ export default function Board() {
       <header>
         <h1>eteller</h1>
         <div className="meta">
-          Poll every <strong>5s</strong> · last read:{' '}
+          Poll every <strong>{POLL_MS / 1000}s</strong> · last read:{' '}
           <strong>{data ? new Date(data.updated).toLocaleTimeString() : '—'}</strong> ·{' '}
-          <span className={conn === 'ok' ? 'ok' : conn === 'error' ? 'bad' : ''}>{conn}</span>
+          <span className={conn === 'live' ? 'ok' : conn === 'error' ? 'bad' : ''}>{conn}</span>
         </div>
       </header>
 
@@ -106,11 +154,16 @@ export default function Board() {
                 0,
                 Math.min(100, parseInt(task.meta.percent || '0', 10) || 0),
               );
-              const cardClass = merged
-                ? 'merged-card'
-                : status === 'done' || status === 'closed'
-                  ? 'done-card'
-                  : '';
+              const cardClass = [
+                merged
+                  ? 'merged-card'
+                  : status === 'done' || status === 'closed'
+                    ? 'done-card'
+                    : '',
+                flashIds.has(task.id) ? 'flash' : '',
+              ]
+                .filter(Boolean)
+                .join(' ');
               return (
                 <article key={task.id} className={`card ${cardClass}`}>
                   <div className="card-head">
@@ -152,7 +205,9 @@ export default function Board() {
       ))}
 
       <footer>
-        Live board for eteller wave tasks. Data from product <code>.eteller/</code> docs on disk.
+        Live board for eteller wave tasks. Reads clone <code>.eteller/progress.md</code> +{' '}
+        <code>state.md</code> from disk every {POLL_MS / 1000}s. Agents must update progress after
+        each milestone.
       </footer>
     </div>
   );
