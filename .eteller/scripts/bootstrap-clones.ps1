@@ -124,7 +124,13 @@ $baseParent = Join-Path $Root 'base'
 $baseClone = Ensure-Clone $baseParent $Integration
 Seed-BaseEteller $baseClone
 
+Write-Host ""
+Write-Host "BASE READY: $baseClone ($Integration)"
+Write-Host "HARD STOP: Do not invent waves/tasks. Ask the user for their story before Plan / Branches / Materialize."
+Write-Host ""
+
 $orch = Join-Path $baseClone '.eteller\orchestration.md'
+$materialized = 0
 if (Test-Path $orch) {
     $rows = Get-Content $orch | Where-Object { $_ -match '^\|\s*[^|]+\s*\|\s*[^|]+\s*\|\s*wave-' }
     foreach ($row in $rows) {
@@ -136,7 +142,7 @@ if (Test-Path $orch) {
         $branch = $parts[1]
         $wave = $parts[2]
         $status = $parts[4].ToLowerInvariant()
-        if ($taskId -eq '<task-id>' -or $taskId -like '<*') { continue }
+        if ($taskId -eq '<task-id>' -or $taskId -like '<*' -or $taskId -like '*(none*') { continue }
         if ($status -eq 'closed') {
             Write-Host "SKIP closed task $taskId"
             continue
@@ -144,9 +150,14 @@ if (Test-Path $orch) {
         $parent = Join-Path $Root "waves\$wave\$taskId"
         $clone = Ensure-Clone $parent $branch
         Seed-TaskEteller $clone $taskId $wave $branch
+        $materialized++
     }
 } else {
     Write-Host "No orchestration.md yet under base - only base was bootstrapped."
+}
+
+if ($materialized -eq 0) {
+    Write-Host "No open tasks in orchestration - waves/ not materialized (awaiting user story)."
 }
 
 Write-Host 'Done.'

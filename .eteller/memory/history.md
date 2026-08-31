@@ -9,6 +9,8 @@ base/<repo>/.eteller/worksession.txt  # rolling summary for automated reporting
 
 ## When to write
 
+The first material history entry for a campaign is the **user story** (after base clone). Do not invent a story or task list just to populate history.
+
 On **every material change to work-session prompting** (user steer that changes plan, waves, tasks, scope, or completion status), the orchestrator must:
 
 1. Add a new file under `history/` named `YYYYMMDDTHHMMSSZ.md` (UTC)

@@ -15,8 +15,14 @@ Framework wiring lives under workspace `.eteller/`. Product clones are generated
 
 `<repo>` comes from `REPO_URL` basename.
 
-Also read [`history.md`](history.md) for work-session recording rules.
+Also read [`workflow.md`](workflow.md) (hard stop after base) and [`history.md`](history.md) (work-session recording).
 
 ## Coding law
 
-`base/<repo>/CurrentTask/*AGENT_SPEC*.md` — single source of truth for how to code. Read-only for workers.
+`base/<repo>/CurrentTask/*AGENT_SPEC*.md` — single source of truth for **how** to code. Read-only for workers.
+
+It is **not** a license to invent the campaign. Waves and tasks come only from the **user story** after base clone (see workflow hard gate).
+
+## Orchestration gate
+
+1. Config → 2. Clone base → **STOP and ask for the user story** → 3. Plan waves/tasks from that story → 4. Branches → 5. Materialize → work.

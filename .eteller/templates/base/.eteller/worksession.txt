@@ -6,4 +6,4 @@ closed_tasks:
 last_prompt_at: 
 last_prompt_summary: 
 history_entries: 0
-notes: Seeded by eteller bootstrap. Update on every material work-session prompt change.
+notes: Seeded by eteller bootstrap. Awaiting user story before any waves/tasks. Update on every material work-session prompt change.

@@ -2,17 +2,21 @@
 
 Coding law (read-only): `base/<repo>/CurrentTask/*AGENT_SPEC*.md`
 
+**Status:** `awaiting_user_story`
+
+Do **not** invent waves or tasks. After base bootstrap, stop and ask the user for their story; fill this file only from that steer.
+
 ## Waves
 
 | Wave | Rationale (shared functionality) | Status | Path |
 |------|----------------------------------|--------|------|
-| wave-1 | <why this wave first> | pending | `.eteller/waves/wave-1/wave_plan.md` |
+| *(none yet — awaiting user story)* | | | |
 
 ## Tasks
 
 | id | branch | wave | depends_on | status | slot path |
 |----|--------|------|------------|--------|-----------|
-| <task-id> | <branch> | wave-1 | — | pending | `waves/wave-1/<task-id>/<repo>/` |
+| *(none yet — awaiting user story)* | | | | | |
 
 ## Rules
 
@@ -20,3 +24,4 @@ Coding law (read-only): `base/<repo>/CurrentTask/*AGENT_SPEC*.md`
 - Never auto-merge PRs
 - Status rolls up from task `state.md` / `progress.md`
 - Work-session prompt changes → `history/` + `worksession.txt` (beside this tree on base)
+- Task ids and branch names come from the user (and workspace naming criteria), never from agent invention

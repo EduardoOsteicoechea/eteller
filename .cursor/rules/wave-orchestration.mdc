@@ -21,6 +21,11 @@ Clone folder name is derived from `REPO_URL` (repo basename). Do not invent a se
 
 Read **only** `base/<repo>/CurrentTask/*AGENT_SPEC*.md` (read-only).
 Do not treat wave-clone `CurrentTask/*AGENT_SPEC*` as law.
+AGENT_SPEC / CurrentTask PROMPTs are **not** a task backlog to invent waves from.
+
+## Hard stop after base
+
+After cloning `base/<repo>/` (bootstrap phase **Base**): **STOP**. Ask the user for their **story** (what to achieve, scope, waves/tasks/branch names they want). Do not continue into plan, branch creation, wave materialization, or product coding until they answer.
 
 ## Obligatory
 
@@ -36,6 +41,9 @@ Do not treat wave-clone `CurrentTask/*AGENT_SPEC*` as law.
 ## Prohibited
 
 - Inventing `REPO_URL` / branches when `.eteller/workspace.config.md` is empty
+- Inventing waves, task ids, or branch names before the user gives their story
+- Auto-filling orchestration from CurrentTask PROMPTs / AGENT_SPEC maps / “next ticket numbers”
+- Creating/pushing task branches or materializing `waves/` before an agreed user story
 - Auto-merging PRs
 - Implementing product features in the eteller framework tree
 - Cross-slot edits
