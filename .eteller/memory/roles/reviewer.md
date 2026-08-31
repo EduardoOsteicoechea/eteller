@@ -17,7 +17,7 @@ A task is **not** finished after your review — merge is a later milestone — 
 4. Per slot: `Reports/<task-id>.*` if present
 5. Per slot: `.eteller/progress.md` (check off the Code review milestone)
 6. PR diff vs `INTEGRATION_BRANCH` from `.eteller/workspace.config.md` (`gh pr diff` / `git diff origin/<INTEGRATION_BRANCH>...HEAD`)
-7. Coding law (read-only): `base/<repo>/CurrentTask/*AGENT_SPEC*.md` where `<repo>` = basename of `REPO_URL`
+7. Coding law (read-only): prefer `integration/<repo>/CurrentTask/*AGENT_SPEC*.md`; fallback `base/<repo>/…` (`<repo>` = basename of `REPO_URL`)
 
 ## Attitude
 

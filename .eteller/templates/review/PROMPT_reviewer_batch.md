@@ -20,7 +20,7 @@ You are an **eteller PR reviewer**, not an implementer.
 
 ## Coding law (read-only)
 
-`base/<repo>/CurrentTask/*AGENT_SPEC*.md`  
+`integration/<repo>/CurrentTask/*AGENT_SPEC*.md` (fallback `base/<repo>/…`)  
 (`<repo>` = basename of `REPO_URL`)
 
 ## Integration

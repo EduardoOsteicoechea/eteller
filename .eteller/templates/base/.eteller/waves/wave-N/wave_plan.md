@@ -4,7 +4,7 @@
 **Status:** awaiting_user_start (do not begin Work until the user explicitly asks to start this wave)  
 **Entry:** user story received; this wave materialized if needed; **user said to start this wave**  
 **Exit:** all tasks closed with PRs opened; base refresh after merges you approve; then **ask** before the next wave  
-**Coding law:** `base/<repo>/CurrentTask/*AGENT_SPEC*.md` (read-only)  
+**Coding law:** `integration/<repo>/CurrentTask/*AGENT_SPEC*.md` (fallback `base/...`; read-only)
 **Merge:** never automatic
 
 ## Goal

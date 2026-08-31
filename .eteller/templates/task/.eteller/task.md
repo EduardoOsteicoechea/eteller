@@ -3,7 +3,7 @@
 **Wave:** wave-N  
 **Branch:** <branch>  
 **Clone cwd:** `waves/wave-N/<task-id>/<repo>/`  
-**Coding law (absolute path — read-only):** `<workspace>/base/<repo>/CurrentTask/*AGENT_SPEC*.md`  
+**Coding law (absolute path — read-only):** `<workspace>/integration/<repo>/CurrentTask/*AGENT_SPEC*.md` (fallback: `base/<repo>/…`)
 **Do not** treat this clone’s `CurrentTask/*AGENT_SPEC*` as law.
 
 **Reports:** `Reports/<task-id>.txt`  

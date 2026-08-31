@@ -3,6 +3,7 @@
 
 # Product clones at workspace root
 /base/
+/integration/
 /waves/
 
 # Board dependencies / build

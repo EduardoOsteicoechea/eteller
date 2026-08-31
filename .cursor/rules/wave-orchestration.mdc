@@ -13,19 +13,27 @@ Clone folder name is derived from `REPO_URL` (repo basename). Do not invent a se
 
 ## Layout
 
-- Root: `base/<repo>/`, `waves/` — product clones (generated here)
+- Root: `base/<repo>/`, `integration/<repo>/`, `waves/` — product clones (generated here)
 - Framework: `.eteller/` (config, scripts, templates, board, memory)
-- Campaign docs: inside product clones under `<clone>/.eteller/` (product branches)
+- Campaign docs: inside **`integration/<repo>/.eteller/`** (product `INTEGRATION_BRANCH`)
 
 ## Coding law
 
-Read **only** `base/<repo>/CurrentTask/*AGENT_SPEC*.md` (read-only).
+Prefer **`integration/<repo>/CurrentTask/*AGENT_SPEC*.md`**; fallback `base/<repo>/CurrentTask/*AGENT_SPEC*.md`.
 Do not treat wave-clone `CurrentTask/*AGENT_SPEC*` as law.
 AGENT_SPEC / CurrentTask PROMPTs are **not** a task backlog to invent waves from.
 
-## Hard stop after base
+## base vs integration
 
-After cloning `base/<repo>/` (bootstrap phase **Base**): **STOP**. Ask the user for their **story** (what to achieve, scope, waves/tasks/branch names they want). Do not continue into plan, branch creation, wave materialization, or product coding until they answer.
+| | `integration/` | `base/` |
+|--|----------------|--------|
+| Role | Live merge target | Last closed / promoted snapshot |
+| Merges / builds / IT / seed-HTML | **Yes** | **No** (until promote) |
+| Update timing | Continuous on `INTEGRATION_BRANCH` | **Only after wave close** (user ask + promote script) |
+
+## Hard stop after base + integration
+
+After cloning `base/<repo>/` and `integration/<repo>/` (bootstrap): **STOP**. Ask the user for their **story**. Do not continue into plan, branch creation, wave materialization, or product coding until they answer.
 
 ## Hard stop before each wave
 
@@ -34,7 +42,11 @@ Do **not** start a wave until the user explicitly asks for that wave (e.g. “st
 - Ask before wave-1 and before every later wave
 - Materializing clones does **not** start work
 - Finishing wave N does **not** start wave N+1 — ask again
-- Record each start-wave steer in base `history/` + `worksession.txt`
+- Record each start-wave steer in **integration** `history/` + `worksession.txt`
+
+## Hard stop before promote base
+
+Do **not** refresh `base/` after merges. Ask the user after validation in `integration/`; then run `.\.eteller\scripts\promote-base-from-integration.ps1`.
 
 ## Obligatory
 
@@ -45,10 +57,10 @@ Do **not** start a wave until the user explicitly asks for that wave (e.g. “st
 - A task is **not** complete until `status: merged` (PR merged). Do not set `percent: 100` / `finished: true` at PR open or review pass
 - On PR open: Reports → **`for_review.md`** → `approved.md` false → `awaiting_review` — **never auto-merge**
 - **Code review:** reviewer updates `approved.md` **and** `progress.md` (Code review milestone); then `status: approved` if pass
-- **Merge:** only if user asks **and** `approved: true`; then check Merge milestone → `merged`
-- **Work-session history (on base):** each material change to work-session prompting → new file in `base/<repo>/.eteller/history/` + refresh `base/<repo>/.eteller/worksession.txt` for automated reporting; commit on **integration branch**. See `.eteller/memory/history.md`
+- **Merge:** only if user asks **and** `approved: true`; pull **`integration/`** after merge — **not** `base/`
+- **Work-session history:** `integration/<repo>/.eteller/history/` + `worksession.txt`; commit on **integration branch** from **`integration/`**. See `.eteller/memory/history.md`
 - Framework changes under `.eteller/` (+ root README / thin AGENTS / this rule): **commit and push** to eteller
-- Never commit `base/` or `waves/` into eteller
+- Never commit `base/`, `integration/`, or `waves/` into eteller
 
 ## Prohibited
 
@@ -61,5 +73,6 @@ Do **not** start a wave until the user explicitly asks for that wave (e.g. “st
 - Auto-merging PRs
 - Merging while `.eteller/approved.md` is missing or `approved: false`
 - Implementer setting `approved: true` on their own PR
+- Updating **`base/`** mid-wave to absorb merges (use **`integration/`**)
 - Implementing product features in the eteller framework tree
 - Cross-slot edits

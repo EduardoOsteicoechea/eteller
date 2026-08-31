@@ -1,6 +1,6 @@
 # Orchestration — campaign index
 
-Coding law (read-only): `base/<repo>/CurrentTask/*AGENT_SPEC*.md`
+Coding law (read-only): `integration/<repo>/CurrentTask/*AGENT_SPEC*.md` (fallback `base/...`)
 
 **Status:** `awaiting_user_story`
 

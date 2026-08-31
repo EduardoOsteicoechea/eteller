@@ -1,9 +1,14 @@
-# Recreate base + wave-task clones for eteller.
+# Recreate base + integration + wave-task clones for eteller.
 # Usage (from workspace root):
 #   .\.eteller\scripts\bootstrap-clones.ps1
 # Requires filled .eteller/workspace.config.md
 # Clone folder name = basename of REPO_URL
 # Note: PowerShell vars are case-insensitive - do not use $Eteller and $eteller.
+#
+# Layout:
+#   base/<repo>/         — last closed / promoted checkpoint (not mid-wave merge target)
+#   integration/<repo>/  — live INTEGRATION_BRANCH (merges, builds, IT, campaign docs)
+#   waves/...            — task slots
 
 $ErrorActionPreference = 'Stop'
 $FrameworkRoot = Split-Path -Parent $PSScriptRoot
@@ -61,7 +66,9 @@ function Ensure-Clone([string]$parentDir, [string]$branch) {
         $code = Invoke-GitQuiet checkout $branch
         if ($code -ne 0) { Pop-Location; throw "git checkout $branch failed in $target" }
         $code = Invoke-GitQuiet pull --ff-only origin $branch
-        if ($code -ne 0) { Pop-Location; throw "git pull failed in $target" }
+        if ($code -ne 0) {
+            Write-Host "WARN: ff-only pull failed in $target (left as-is). For base this is OK mid-wave; use promote script after close."
+        }
         Pop-Location
         return ,$target
     }
@@ -91,7 +98,7 @@ function Seed-TaskEteller([string]$clonePath, [string]$taskId, [string]$wave, [s
     }
 }
 
-function Seed-BaseEteller([string]$clonePath) {
+function Seed-CampaignEteller([string]$clonePath) {
     $cloneEteller = Join-Path $clonePath '.eteller'
     $src = Join-Path $FrameworkRoot 'templates\base\.eteller'
     $orchPath = Join-Path $cloneEteller 'orchestration.md'
@@ -120,16 +127,27 @@ function Seed-BaseEteller([string]$clonePath) {
     }
 }
 
+# --- base (checkpoint) + integration (live) ---
 $baseParent = Join-Path $Root 'base'
 $baseClone = Ensure-Clone $baseParent $Integration
-Seed-BaseEteller $baseClone
+Seed-CampaignEteller $baseClone
+
+$integrationParent = Join-Path $Root 'integration'
+$integrationClone = Ensure-Clone $integrationParent $Integration
+Seed-CampaignEteller $integrationClone
 
 Write-Host ""
-Write-Host "BASE READY: $baseClone ($Integration)"
+Write-Host "BASE READY: $baseClone ($Integration) — promote only after wave close"
+Write-Host "INTEGRATION READY: $integrationClone ($Integration) — merges / builds / IT / campaign docs"
 Write-Host "HARD STOP: Do not invent waves/tasks. Ask the user for their story before Plan / Branches / Materialize."
 Write-Host ""
 
-$orch = Join-Path $baseClone '.eteller\orchestration.md'
+# Prefer orchestration from integration (live)
+$orch = Join-Path $integrationClone '.eteller\orchestration.md'
+if (-not (Test-Path $orch)) {
+    $orch = Join-Path $baseClone '.eteller\orchestration.md'
+}
+
 $materialized = 0
 if (Test-Path $orch) {
     $rows = Get-Content $orch | Where-Object { $_ -match '^\|\s*[^|]+\s*\|\s*[^|]+\s*\|\s*wave-' }
@@ -157,7 +175,7 @@ if (Test-Path $orch) {
         $materialized++
     }
 } else {
-    Write-Host "No orchestration.md yet under base - only base was bootstrapped."
+    Write-Host "No orchestration.md yet under integration/base - only clones were bootstrapped."
 }
 
 if ($materialized -eq 0) {
