@@ -143,8 +143,12 @@ if (Test-Path $orch) {
         $wave = $parts[2]
         $status = $parts[4].ToLowerInvariant()
         if ($taskId -eq '<task-id>' -or $taskId -like '<*' -or $taskId -like '*(none*') { continue }
-        if ($status -eq 'closed') {
-            Write-Host "SKIP closed task $taskId"
+        if ($status -eq 'closed' -or $status -like 'blocked*') {
+            Write-Host "SKIP $status task $taskId"
+            continue
+        }
+        if ($branch -eq 'TBD' -or $branch -like '<*') {
+            Write-Host "SKIP task $taskId (branch not assigned)"
             continue
         }
         $parent = Join-Path $Root "waves\$wave\$taskId"
