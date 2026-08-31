@@ -36,8 +36,10 @@ For **each** row in the table below:
 2. Read `<clone>/Reports/<task-id>.*` if present
 3. Review the PR diff vs `<INTEGRATION_BRANCH>`
 4. Write `<clone>/.eteller/approved.md` (`approved: true|false` + findings)
-5. Update `<clone>/.eteller/state.md`
+5. Update `<clone>/.eteller/state.md` and `progress.md`
 6. Commit + push on that wave-task branch (`approved.md`, `progress.md`, `state.md`)
+
+**Reviewer gates (product AGENT_SPEC):** block on missing triple Release build evidence when code changed. Do **not** block on per-task Revit IT or missing QA HTML on the task branch.
 
 ### Ticket map (fill)
 

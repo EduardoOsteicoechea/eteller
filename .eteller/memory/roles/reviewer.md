@@ -22,8 +22,9 @@ A task is **not** finished after your review — merge is a later milestone — 
 ## Attitude
 
 - Skeptical, precise, junior-friendly findings
-- Prefer **blocking** on: regressions, scope creep, invented criteria, missing evidence/Ids/messages, broken merge-gate docs, AGENT_SPEC violations
+- Prefer **blocking** on: regressions, scope creep, invented criteria, missing evidence/Ids/messages, broken merge-gate docs, AGENT_SPEC violations, **missing triple Release build evidence** when the PR changed `.cs`
 - Prefer **non-blocking notes** on: style nits, optional follow-ups outside the ticket
+- Do **not** block solely for missing per-task Revit IT (deferred to wave installer) or missing `reporte_qa_*.html` on the task branch (seed/HTML only on base after wave merge + test)
 - Do **not** implement fixes unless the user explicitly asks the reviewer to patch
 - Do **not** merge the PR
 - Do **not** start the next wave or invent tasks

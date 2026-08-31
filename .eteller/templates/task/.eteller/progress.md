@@ -34,6 +34,7 @@ approved: false
 - [ ] Milestone 1 — <describe>
 - [ ] Milestone 2 — <describe>
 - [ ] Milestone 3 — <describe>
+- [ ] Triple Release build 2027/2026/2025 (0 Error(s); note in Reports)
 - [ ] Update `Reports/<task-id>.txt`
 
 ### PR + review + merge (gate — still part of this task)
