@@ -1,0 +1,18 @@
+# Local product binding
+workspace.config.md
+
+# Product clones (separate git repos)
+base/
+waves/
+
+# Board dependencies / build
+board/node_modules/
+board/dist/
+board/.astro/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.log
+.env
+.env.*

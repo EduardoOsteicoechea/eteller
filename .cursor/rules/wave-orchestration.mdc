@@ -1,0 +1,38 @@
+---
+description: eteller orchestration protocol — always apply in this workspace
+alwaysApply: true
+---
+
+# eteller
+
+Workflow name is **eteller**. Do not name the workflow after the containing directory.
+
+Read [AGENTS.md](AGENTS.md), then `.memory/README.md` and `.memory/workflow.md`, then `workspace.config.md`.
+
+## Layout
+
+- `base/<REPO_DIR_NAME>/` — `INTEGRATION_BRANCH` only (coding law + campaign `.eteller/`)
+- `waves/wave-N/<task-id>/<REPO_DIR_NAME>/` — one clone per wave-task branch
+- Campaign docs live **inside** product clones under `.eteller/` (product branches), not on the eteller remote
+
+## Coding law
+
+Read **only** `base/<REPO_DIR_NAME>/CurrentTask/*AGENT_SPEC*.md` (read-only).
+Do not treat wave-clone `CurrentTask/*AGENT_SPEC*` as law.
+
+## Obligatory
+
+- One agent = one task slot; product edits only in that clone cwd
+- Skip slots with `state.md` `finished: true` / `status: closed`
+- Subagents: `model: "cursor-grok-4.5-high"`
+- Every wave-task has milestones in `.eteller/progress.md`; update on each milestone complete, then commit on the **wave-task branch**
+- On complete: update `Reports/<task-id>.txt`, open PR to `INTEGRATION_BRANCH`, mark closed — **never auto-merge**
+- Framework changes (`board/`, rules, `.memory/`, scripts, templates, README, example config): **commit and push** to eteller
+- Never commit `base/` or `waves/` into eteller
+
+## Prohibited
+
+- Inventing `REPO_URL` / branches when `workspace.config.md` is empty
+- Auto-merging PRs
+- Implementing product features in the eteller framework tree
+- Cross-slot edits
