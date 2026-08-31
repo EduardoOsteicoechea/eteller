@@ -6,27 +6,36 @@
 **Coding law (absolute path — read-only):** `<workspace>/base/<repo>/CurrentTask/*AGENT_SPEC*.md`  
 **Do not** treat this clone’s `CurrentTask/*AGENT_SPEC*` as law.
 
-**Reports:** `Reports/<task-id>.txt` (update on completion)  
+**Reports:** `Reports/<task-id>.txt`  
 **Review packet:** `.eteller/for_review.md` (implementer) → `.eteller/approved.md` (reviewer)  
-**Milestones:** sibling `progress.md` — **update after every segment**
+**Progress:** sibling `progress.md` — coding **and** PR / review / merge milestones; board polls it  
+**Done means:** PR **merged** (not merely reviewed)
 
 ## Progress reporting (mandatory)
 
-On start: set `progress.md` `status: in_progress`, `current_task`, `updated`.  
-After each milestone: check it off, bump `percent` / `current_task` / `updated`, write the file.  
-The live board reads these files from disk; silent work = empty board.
+On start: `progress.md` `status: in_progress`, `current_task`, `updated`.  
+After **each** milestone (including review + merge): check it off, bump `percent` / `current_task` / `status` / `updated`, write the file.  
+Live board = disk files; silent work = empty / stale board.
 
-## Completion (implementer)
+Never set `percent: 100` or `finished: true` until **Merge** is done.
 
-1. Update `Reports/<task-id>.txt`
-2. Write `.eteller/for_review.md` (in-depth PR explanation for reviewers)
-3. Ensure `.eteller/approved.md` exists with `approved: false`
+## Implementer steps (not done yet)
+
+1. Coding milestones + `Reports/<task-id>.txt`
+2. Write `.eteller/for_review.md`
+3. Ensure `.eteller/approved.md` with `approved: false`
 4. Open PR → `INTEGRATION_BRANCH` (do **not** merge)
-5. Set `state.md` to `awaiting_review` with PR URL; progress notes review pending
-6. Commit + push on this wave-task branch
+5. `state.md` + `progress.md` → `awaiting_review`; check PR milestone; commit + push
 
-## Merge (orchestrator — after review)
+## Reviewer steps (still this task)
 
-Only when the user explicitly asks **and** `.eteller/approved.md` has `approved: true`.  
-Reviewer role: `.eteller/memory/roles/reviewer.md` (user launches review subagents).
+1. Follow `.eteller/memory/roles/reviewer.md`
+2. Write `approved.md`; if `approved: true`, check **Code review** milestone in `progress.md`, set `status: approved`, bump percent, update `state.md`
+3. Commit + push wave-task branch
+
+## Merge (orchestrator — user must ask)
+
+1. Only if `approved: true` and user asks
+2. Merge PR → check **Merge** milestone → `status: merged`, `percent: 100`, `finished: true`
+3. Then the task is complete on the board
 

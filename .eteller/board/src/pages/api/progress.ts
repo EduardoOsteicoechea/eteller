@@ -100,9 +100,59 @@ function mergeStatus(
 ): string {
   const finished = (stateMeta.finished || '').toLowerCase() === 'true';
   const stateStatus = (stateMeta.status || '').toLowerCase();
-  if (finished || stateStatus === 'closed') return 'closed';
+  const progressStatus = (progressMeta.status || '').toLowerCase();
+  const approved =
+    (stateMeta.approved || progressMeta.approved || '').toLowerCase() === 'true';
+
+  // Terminal success on the board = merged only (not "closed" after PR open).
+  if (stateStatus === 'merged' || progressStatus === 'merged') return 'merged';
+  if (finished && (stateStatus === 'abandoned' || progressStatus === 'abandoned')) {
+    return 'abandoned';
+  }
+  // Legacy: finished/closed without merge → still in flight toward merge.
+  if (finished || stateStatus === 'closed' || progressStatus === 'closed') {
+    if (approved) return 'approved';
+    if (stateMeta.pr_url || progressMeta.pr_status) return 'awaiting_review';
+    return progressStatus === 'closed' ? 'in_progress' : stateStatus || 'in_progress';
+  }
+
   if (stateStatus === 'blocked' || stateStatus === 'blocked_client') return stateStatus;
-  return progressMeta.status || stateStatus || 'pending';
+  if (progressStatus === 'blocked' || progressStatus === 'blocked_client') {
+    return progressStatus;
+  }
+
+  if (stateStatus === 'approved' || progressStatus === 'approved' || approved) {
+    return 'approved';
+  }
+  if (stateStatus === 'awaiting_review' || progressStatus === 'awaiting_review') {
+    return 'awaiting_review';
+  }
+
+  return progressStatus || stateStatus || 'pending';
+}
+
+function derivePercent(
+  milestones: { done: boolean; text: string }[],
+  status: string,
+  declared: string | undefined,
+): string {
+  if (status === 'merged') return '100';
+  if (milestones.length > 0) {
+    const doneCount = milestones.filter((m) => m.done).length;
+    let pct = Math.round((doneCount / milestones.length) * 100);
+    // Never show 100% until merge (even if someone checked everything except merge by mistake).
+    const mergeOpen = milestones.some(
+      (m) => !m.done && /merge/i.test(m.text),
+    );
+    if (mergeOpen && pct >= 100) pct = Math.min(99, Math.round(((milestones.length - 1) / milestones.length) * 100));
+    if (status !== 'merged' && pct >= 100) pct = 99;
+    return String(pct);
+  }
+  if (declared && status !== 'merged') {
+    const n = parseInt(declared, 10);
+    if (!Number.isNaN(n) && n >= 100) return '99';
+  }
+  return declared || '0';
 }
 
 export const GET: APIRoute = async () => {
@@ -186,13 +236,12 @@ export const GET: APIRoute = async () => {
       if (!meta.wave) meta.wave = waveId;
       if (!meta.branch) meta.branch = stateMeta.branch || taskId;
       meta.status = mergeStatus(progressMeta, stateMeta);
-      if (stateMeta.pr_url && !meta.pr_status) meta.pr_status = stateMeta.pr_url;
+      if (stateMeta.pr_url) meta.pr_status = stateMeta.pr_url;
+      else if (!meta.pr_status && progressMeta.pr_status) meta.pr_status = progressMeta.pr_status;
+      if (stateMeta.approved) meta.approved = stateMeta.approved;
+      if (stateMeta.review) meta.review = stateMeta.review;
 
-      const doneCount = milestones.filter((m) => m.done).length;
-      if ((!meta.percent || meta.percent === '0') && milestones.length > 0 && doneCount > 0) {
-        meta.percent = String(Math.round((doneCount / milestones.length) * 100));
-      }
-      if (!meta.percent) meta.percent = '0';
+      meta.percent = derivePercent(milestones, meta.status, meta.percent);
 
       const mtime = [fileMtime(progressPath), fileMtime(statePath)]
         .filter(Boolean)

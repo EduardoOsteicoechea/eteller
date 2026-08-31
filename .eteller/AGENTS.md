@@ -43,7 +43,10 @@ Never invent a second coding law. Never auto-merge wave-task PRs.
 Before any merge of a wave-task PR:
 
 1. Implementer wrote `.eteller/for_review.md` on the task branch
-2. A **reviewer**-role agent wrote `.eteller/approved.md` with `approved: true`
+2. A **reviewer**-role agent wrote `.eteller/approved.md` with `approved: true` **and** updated `progress.md` (Code review milestone)
 3. User explicitly asked to merge
+4. After merge: `progress.md` / `state.md` → `status: merged`, `percent: 100`, `finished: true`
+
+A task is **not** done on the live board until **merged**.
 
 Role contract: [`memory/roles/reviewer.md`](memory/roles/reviewer.md). Implementers must not self-approve.

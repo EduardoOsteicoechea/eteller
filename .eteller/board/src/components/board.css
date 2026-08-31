@@ -102,6 +102,16 @@ body {
   box-shadow: 0 0 0 1px rgba(60, 184, 120, 0.15);
 }
 
+.card.review-card {
+  border-color: #8a6d2b;
+  box-shadow: 0 0 0 1px rgba(224, 161, 6, 0.18);
+}
+
+.card.approved-card {
+  border-color: #2a6f8f;
+  box-shadow: 0 0 0 1px rgba(61, 156, 240, 0.2);
+}
+
 .card.merged-card {
   opacity: 0.55;
   filter: grayscale(0.85);
@@ -160,6 +170,18 @@ body {
   background: #1a2028;
 }
 
+.badge.approved {
+  color: #7ec8f5;
+  border-color: #2a5f8f;
+  background: #14304a;
+}
+
+.badge.awaiting_review {
+  color: var(--warn);
+  border-color: #8a6d2b;
+  background: #3a2e12;
+}
+
 .badge.in_progress {
   color: var(--accent);
   border-color: #2a5f8f;
@@ -209,6 +231,15 @@ body {
 .clone {
   font-size: 0.8rem;
   color: var(--muted);
+}
+
+.pr-link {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.pr-link a {
+  color: var(--accent);
 }
 
 .clone code,

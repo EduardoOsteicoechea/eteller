@@ -27,10 +27,14 @@ const POLL_MS = 1500;
 
 function badgeClass(status: string) {
   const s = (status || 'idle').toLowerCase();
-  if (s === 'done' || s === 'closed') return 'done';
   if (s === 'merged') return 'merged';
+  if (s === 'approved') return 'approved';
+  if (s === 'awaiting_review') return 'awaiting_review';
   if (s === 'blocked' || s === 'blocked_client') return 'blocked';
   if (s === 'in_progress' || s === 'active' || s === 'ready_for_pr') return 'in_progress';
+  if (s === 'abandoned') return 'idle';
+  // Legacy "closed/done" without merge is not a success badge.
+  if (s === 'done' || s === 'closed') return 'awaiting_review';
   return 'idle';
 }
 
@@ -155,11 +159,9 @@ export default function Board() {
                 Math.min(100, parseInt(task.meta.percent || '0', 10) || 0),
               );
               const cardClass = [
-                merged
-                  ? 'merged-card'
-                  : status === 'done' || status === 'closed'
-                    ? 'done-card'
-                    : '',
+                merged ? 'merged-card' : '',
+                status === 'awaiting_review' ? 'review-card' : '',
+                status === 'approved' ? 'approved-card' : '',
                 flashIds.has(task.id) ? 'flash' : '',
               ]
                 .filter(Boolean)
@@ -182,7 +184,16 @@ export default function Board() {
                   </div>
                   <div className="pct">
                     {percent}% · updated {task.meta.updated || '—'}
+                    {task.meta.approved ? ` · approved=${task.meta.approved}` : ''}
                   </div>
+                  {task.meta.pr_status && (
+                    <div className="pr-link">
+                      <a href={task.meta.pr_status} target="_blank" rel="noreferrer">
+                        PR
+                      </a>
+                      {task.meta.review ? ` · review=${task.meta.review}` : ''}
+                    </div>
+                  )}
                   <ul className="subs">
                     {task.milestones.length === 0 && <li>No milestones yet</li>}
                     {task.milestones.map((m, i) => (

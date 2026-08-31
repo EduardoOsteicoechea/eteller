@@ -39,11 +39,13 @@ Do **not** start a wave until the user explicitly asks for that wave (e.g. “st
 ## Obligatory
 
 - One agent = one task slot; product edits only in that clone cwd
-- Skip slots with `state.md` `finished: true` / `status: closed` (except reviewer work on `awaiting_review`)
+- Skip slots with `state.md` `finished: true` / `status: merged` (or `abandoned`); allow work on `awaiting_review` / `approved` for reviewers and merge
 - Subagents: `model: "cursor-grok-4.5-high"`
-- Milestones in clone `.eteller/progress.md`; **write after every segment** (`[x]`, `percent`, `current_task`, `status`, `updated`) so the live board can poll; commit on the **wave-task branch**
-- On complete: Reports → **`for_review.md`** → open PR → `approved.md` starts `approved: false` → `state.md` `awaiting_review` — **never auto-merge**
-- **Code review before merge:** user launches reviewer agents per [`.eteller/memory/roles/reviewer.md`](.eteller/memory/roles/reviewer.md); merge only if user asks **and** `approved.md` has `approved: true`
+- Milestones in clone `.eteller/progress.md` include coding **and** `for_review` / open PR / code review / **merge**; **write after every segment**; board polls disk
+- A task is **not** complete until `status: merged` (PR merged). Do not set `percent: 100` / `finished: true` at PR open or review pass
+- On PR open: Reports → **`for_review.md`** → `approved.md` false → `awaiting_review` — **never auto-merge**
+- **Code review:** reviewer updates `approved.md` **and** `progress.md` (Code review milestone); then `status: approved` if pass
+- **Merge:** only if user asks **and** `approved: true`; then check Merge milestone → `merged`
 - **Work-session history (on base):** each material change to work-session prompting → new file in `base/<repo>/.eteller/history/` + refresh `base/<repo>/.eteller/worksession.txt` for automated reporting; commit on **integration branch**. See `.eteller/memory/history.md`
 - Framework changes under `.eteller/` (+ root README / thin AGENTS / this rule): **commit and push** to eteller
 - Never commit `base/` or `waves/` into eteller

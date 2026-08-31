@@ -15,16 +15,20 @@
 
 ## Status values
 
-| status | Meaning |
-|--------|---------|
-| `pending` | Not started |
-| `in_progress` | Coding |
-| `awaiting_review` | PR open; `for_review.md` ready; merge blocked |
-| `approved` | Reviewer set `approved.md` → `approved: true` |
-| `closed` | Merged or abandoned per user |
-| `blocked_client` / `blocked*` | Skip coding |
+| status | Meaning | Board “done”? |
+|--------|---------|----------------|
+| `pending` | Not started | No |
+| `in_progress` | Coding | No |
+| `awaiting_review` | PR open; `for_review.md` ready | No |
+| `approved` | Reviewer approved; wait human merge | No |
+| `merged` | PR merged to integration | **Yes** |
+| `blocked_client` / `blocked*` | Skip coding | No |
+| `abandoned` | Explicitly dropped (rare) | No |
+
+`finished: true` **only** when `status: merged` (or `abandoned`).
 
 ## Notes
 
 - Merge requires user ask + `approved: true` in `.eteller/approved.md`
+- Task is **not** complete at PR open or review pass — only after merge
 -

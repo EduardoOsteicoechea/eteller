@@ -6,7 +6,8 @@ Do **not** use this attitude while coding product features, planning waves, or w
 
 ## Mission
 
-Review one (or more) wave-task PR(s) against each slot’s `for_review.md` and the diff. Decide whether merge is allowed by writing/updating sibling `approved.md`.
+Review one (or more) wave-task PR(s) against each slot’s `for_review.md` and the diff. Decide whether merge is allowed by writing/updating sibling `approved.md`.  
+A task is **not** finished after your review — merge is a later milestone — but you **must** update that slot’s `progress.md` so the live board shows review as a completed subtask.
 
 ## Inputs (read in order)
 
@@ -14,8 +15,9 @@ Review one (or more) wave-task PR(s) against each slot’s `for_review.md` and t
 2. The **campaign review prompt** the user pasted or pointed to (lists task ids, clone paths, PR URLs, integration branch) — required for batches
 3. Per slot: clone `.eteller/for_review.md` (implementer brief; required)
 4. Per slot: `Reports/<task-id>.*` if present
-5. PR diff vs `INTEGRATION_BRANCH` from `.eteller/workspace.config.md` (`gh pr diff` / `git diff origin/<INTEGRATION_BRANCH>...HEAD`)
-6. Coding law (read-only): `base/<repo>/CurrentTask/*AGENT_SPEC*.md` where `<repo>` = basename of `REPO_URL` — judge surgical/legacy rules; do not invent scope
+5. Per slot: `.eteller/progress.md` (check off the Code review milestone)
+6. PR diff vs `INTEGRATION_BRANCH` from `.eteller/workspace.config.md` (`gh pr diff` / `git diff origin/<INTEGRATION_BRANCH>...HEAD`)
+7. Coding law (read-only): `base/<repo>/CurrentTask/*AGENT_SPEC*.md` where `<repo>` = basename of `REPO_URL`
 
 ## Attitude
 
@@ -25,10 +27,11 @@ Review one (or more) wave-task PR(s) against each slot’s `for_review.md` and t
 - Do **not** implement fixes unless the user explicitly asks the reviewer to patch
 - Do **not** merge the PR
 - Do **not** start the next wave or invent tasks
+- Do **not** set `status: merged` / `percent: 100` / `finished: true`
 
-## Output — `approved.md` (mandatory, per slot)
+## Output (mandatory, per slot)
 
-Overwrite that clone’s `.eteller/approved.md`:
+### 1. `.eteller/approved.md`
 
 ```
 approved: true|false
@@ -38,15 +41,19 @@ pr_url: <url>
 verdict: approved|blocked
 ```
 
-Then Findings + Decision sections.
+Findings + Decision sections.
 
-- `approved: false` → merge **blocked**
-- `approved: true` → merge **released for the human** (human must still explicitly ask to merge)
+### 2. `.eteller/progress.md` (board)
 
-Also update that clone’s `.eteller/state.md` (`approved`, `review`, `status`, `updated`).
+- If `approved: true`: check `[x]` the **Code review** milestone; set `status: approved`; set `approved: true`; set `current_task` to the Merge milestone; recompute `percent`; set `updated`
+- If `approved: false`: leave Code review unchecked (or note blocked); keep `status: awaiting_review`; set `approved: false`; set `current_task` to what the implementer must fix; recompute `percent`; set `updated`
 
-Commit + push **only** on the wave-task branch (`approved.md`, `state.md`).
+### 3. `.eteller/state.md`
+
+Update `approved`, `review`, `status` (`approved` or `awaiting_review`), `updated`. Keep `finished: false`.
+
+Commit + push on the wave-task branch: `approved.md`, `progress.md`, `state.md`.
 
 ## Re-review
 
-If the implementer pushes fixes: set `approved: false` again until you re-read updated `for_review.md` + new diff and explicitly approve.
+If the implementer pushes fixes: set `approved: false` again, uncheck Code review if needed, until you re-approve.
