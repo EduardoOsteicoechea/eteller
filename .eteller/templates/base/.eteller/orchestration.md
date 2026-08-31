@@ -19,3 +19,4 @@ Coding law (read-only): `base/<repo>/CurrentTask/*AGENT_SPEC*.md`
 - Skip `closed` tasks
 - Never auto-merge PRs
 - Status rolls up from task `state.md` / `progress.md`
+- Work-session prompt changes → `history/` + `worksession.txt` (beside this tree on base)

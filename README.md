@@ -51,6 +51,8 @@ base/<repo>/                 # integration branch (at root)
   CurrentTask/*AGENT_SPEC*
   .eteller/orchestration.md
   .eteller/waves/wave-N/wave_plan.md
+  .eteller/history/            # work-session prompt records
+  .eteller/worksession.txt     # rolling report for automation
 waves/wave-N/<task-id>/<repo>/
   .eteller/task.md|state.md|progress.md
   Reports/<task-id>.txt
@@ -59,6 +61,7 @@ waves/wave-N/<task-id>/<repo>/
 ## Rules of thumb
 
 - Coding criteria: base `CurrentTask` agent spec only
+- Each material work-session prompt/steer → `base/.../.eteller/history/` + update `worksession.txt` (commit on integration)
 - Milestones: update clone `.eteller/progress.md`, commit on the wave-task branch
 - Task complete: Reports → open PR → mark closed — **never auto-merge**
 - Framework changes under `.eteller/`: commit and push to the eteller remote

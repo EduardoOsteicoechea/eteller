@@ -29,6 +29,7 @@ Do not treat wave-clone `CurrentTask/*AGENT_SPEC*` as law.
 - Subagents: `model: "cursor-grok-4.5-high"`
 - Milestones in clone `.eteller/progress.md`; commit on the **wave-task branch**
 - On complete: Reports → open PR → mark closed — **never auto-merge**
+- **Work-session history (on base):** each material change to work-session prompting → new file in `base/<repo>/.eteller/history/` + refresh `base/<repo>/.eteller/worksession.txt` for automated reporting; commit on **integration branch**. See `.eteller/memory/history.md`
 - Framework changes under `.eteller/` (+ root README / thin AGENTS / this rule): **commit and push** to eteller
 - Never commit `base/` or `waves/` into eteller
 

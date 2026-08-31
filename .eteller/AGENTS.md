@@ -12,6 +12,7 @@ Read, in this order:
 4. Campaign docs on product clones (when they exist):
    - `../base/<repo>/.eteller/orchestration.md`
    - `../base/<repo>/.eteller/waves/wave-N/wave_plan.md`
+   - `../base/<repo>/.eteller/history/` + `../base/<repo>/.eteller/worksession.txt`
    - `../waves/wave-N/<task-id>/<repo>/.eteller/{task,state,progress}.md`
 
 `<repo>` = basename of `REPO_URL` (e.g. `…/model-checker-buenos-aires.git` → `model-checker-buenos-aires`).
@@ -23,5 +24,8 @@ Read, in this order:
 | How to orchestrate | `.eteller/` rules + memory |
 | Product coding criteria | `base/<repo>/CurrentTask/*AGENT_SPEC*.md` (read-only) |
 | Campaign / wave / task progress | Product branches under clone `.eteller/` |
+| Work-session prompt history / reporting | `base/<repo>/.eteller/history/` + `worksession.txt` (integration branch) |
+
+On every material work-session prompt/steer change: append `history/YYYYMMDDTHHMMSSZ.md` and update `worksession.txt` (see [`memory/history.md`](memory/history.md)). Commit on the integration branch.
 
 Never invent a second coding law. Never auto-merge wave-task PRs.

@@ -81,14 +81,26 @@ function Seed-TaskEteller([string]$clonePath, [string]$taskId, [string]$wave, [s
 
 function Seed-BaseEteller([string]$clonePath) {
     $eteller = Join-Path $clonePath '.eteller'
+    $src = Join-Path $Eteller 'templates\base\.eteller'
     if (-not (Test-Path $eteller)) {
-        $src = Join-Path $Eteller 'templates\base\.eteller'
         New-Item -ItemType Directory -Force -Path $eteller | Out-Null
         Copy-Item (Join-Path $src 'orchestration.md') $eteller -Force
         $wavesTpl = Join-Path $src 'waves'
         if (Test-Path $wavesTpl) {
             Copy-Item $wavesTpl (Join-Path $eteller 'waves') -Recurse -Force
         }
+    }
+    $history = Join-Path $eteller 'history'
+    if (-not (Test-Path $history)) {
+        New-Item -ItemType Directory -Force -Path $history | Out-Null
+        $histTpl = Join-Path $src 'history'
+        if (Test-Path $histTpl) {
+            Copy-Item (Join-Path $histTpl '*') $history -Force
+        }
+    }
+    $ws = Join-Path $eteller 'worksession.txt'
+    if (-not (Test-Path $ws)) {
+        Copy-Item (Join-Path $src 'worksession.txt') $ws -Force
     }
 }
 

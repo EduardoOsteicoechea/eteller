@@ -9,11 +9,12 @@ Wait for the user to steer each phase. Do not auto-run the full pipeline.
 3. **Plan** — write on base (commit on integration branch):
    - `base/<repo>/.eteller/orchestration.md`
    - `base/<repo>/.eteller/waves/wave-N/wave_plan.md`
+   - After each material prompt/steer: `base/<repo>/.eteller/history/YYYYMMDDTHHMMSSZ.md` + update `worksession.txt` (see `memory/history.md`)
 4. **Branches** — exact names the user dictates (match naming criteria).
 5. **Materialize** — `waves/wave-N/<task-id>/<repo>/` at root; seed clone `.eteller/` from `.eteller/templates/` if missing.
 6. **Work** — code in that clone; follow **base** AGENT_SPEC; update clone `.eteller/progress.md` on milestones; commit on wave-task branch.
-7. **Close** — Reports → open PR → `state.md` closed. **Do not merge** unless user asks.
-8. **Refresh base** — after merge, pull base.
+7. **Close** — Reports → open PR → `state.md` closed. **Do not merge** unless user asks. Record the steer in base history + `worksession.txt`.
+8. **Refresh base** — after merge, pull base; refresh `worksession.txt`.
 
 ## Models
 
@@ -23,4 +24,4 @@ Task subagents: always `model: "cursor-grok-4.5-high"`.
 
 - Framework (`.eteller/` wiring, root README/thin AGENTS/rules) → **eteller** remote
 - Clone `.eteller/progress|task|state` → **wave-task branch**
-- Base `orchestration.md` / `wave_plan.md` → **integration branch**
+- Base `orchestration.md` / `wave_plan.md` / `history/` / `worksession.txt` → **integration branch**
