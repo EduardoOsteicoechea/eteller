@@ -17,7 +17,9 @@ Framework wiring lives under workspace `.eteller/`. Product clones are generated
 
 Also read [`workflow.md`](workflow.md) (hard stops + **merge code-review gate**) and [`history.md`](history.md) (work-session recording).
 
-Reviewer-only attitude: [`roles/reviewer.md`](roles/reviewer.md) — load only when assigned to review a PR.
+Reviewer-only attitude: [`roles/reviewer.md`](roles/reviewer.md) — load only when assigned to review a PR.  
+Agnostic batch prompt skeleton: [`../templates/review/PROMPT_reviewer_batch.md`](../templates/review/PROMPT_reviewer_batch.md).  
+Filled campaign prompts live under `base/<repo>/.eteller/prompts/` (product branch), not in the framework.
 
 ## Coding law
 

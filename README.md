@@ -16,7 +16,7 @@ Framework wiring lives under **`.eteller/`**. Product clones are generated at th
 - Tracks campaign/wave/task state in product-owned `.eteller/` docs inside those clones
 - Serves a live progress board from `.eteller/board/`
 - Enforces a single coding law from the base branch agent spec
-- **Code-review gate before merge:** implementer writes `for_review.md`; reviewer agents (role `.eteller/memory/roles/reviewer.md`) set `approved.md`; merge only on your ask + `approved: true`
+- **Code-review gate before merge:** implementer writes `for_review.md`; reviewer agents (agnostic role `.eteller/memory/roles/reviewer.md`) set `approved.md`; campaign-specific review prompts live under `base/<repo>/.eteller/prompts/`
 
 The clone directory name is always the **repository basename** from `REPO_URL` (no separate config field).
 
