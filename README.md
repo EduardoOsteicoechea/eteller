@@ -11,6 +11,7 @@ Framework wiring lives under **`.eteller/`**. Product clones are generated at th
 - Binds to a product repo via `.eteller/workspace.config.md`
 - Keeps an integration checkout in `base/`
 - **Stops after base** until you give the campaign story
+- **Asks before each wave** — does not start wave work until you say so
 - Then materializes wave-task clones under `waves/` from **your** plan
 - Tracks campaign/wave/task state in product-owned `.eteller/` docs inside those clones
 - Serves a live progress board from `.eteller/board/`
@@ -32,8 +33,9 @@ The clone directory name is always the **repository basename** from `REPO_URL` (
 
 3. **Stop.** Tell the agent your **story** (goal, scope, waves, task ids / branch names). Agents must not invent tasks from `CurrentTask/` on their own.
 4. After you steer: write `base/<repo>/.eteller/orchestration.md` and wave plans (commit on the integration branch).
-5. Re-run bootstrap after open tasks are listed (creates `waves/` slots).
-6. Run the board (optional):
+5. Re-run bootstrap after open tasks are listed (creates `waves/` slots). **This does not start work.**
+6. When ready, tell the agent which wave to start (e.g. “start wave-1”). Agents must ask before every wave and must not auto-advance.
+7. Run the board (optional):
 
 ```powershell
 cd .eteller\board
@@ -63,6 +65,7 @@ waves/wave-N/<task-id>/<repo>/
 ## Rules of thumb
 
 - After base clone: **ask for the user story** before any wave/task orchestration
+- Before each wave: **ask** and wait for an explicit “start wave-N” (materialize ≠ start; closing a wave ≠ start next)
 - Coding criteria: base `CurrentTask` agent spec only (how to code — not what to invent)
 - Each material work-session prompt/steer → `base/.../.eteller/history/` + update `worksession.txt` (commit on integration)
 - Milestones: update clone `.eteller/progress.md`, commit on the wave-task branch

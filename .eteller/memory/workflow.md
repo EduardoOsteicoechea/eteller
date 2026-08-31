@@ -2,7 +2,7 @@
 
 Wait for the user to steer each phase. Do not auto-run the full pipeline.
 
-## Hard gate (non-negotiable)
+## Hard gate A — after base (non-negotiable)
 
 After **Base** succeeds, the agent must **STOP** and ask the user for their **story** (campaign goal, scope, constraints, preferred waves/tasks/branch names if they have them).
 
@@ -17,6 +17,25 @@ Until the user has given that story in this session (or an explicit follow-up st
 
 Reading base `CurrentTask/*AGENT_SPEC*` for later coding law is fine; treating it as a task backlog to execute is not.
 
+## Hard gate B — before each wave (non-negotiable)
+
+Planning, materializing clones, or listing waves in orchestration does **not** authorize starting work on a wave.
+
+Before starting **any** wave (launching task agents, coding in that wave’s slots, or treating that wave as `active`):
+
+1. **STOP** and ask the user explicitly whether to start that wave (name it: e.g. “¿Empezamos wave-1?”).
+2. Wait for an explicit user request such as “start wave-1”, “empezar oleada 2”, or equivalent for that wave id.
+3. Only then set `active_wave`, assign agents, and code in that wave’s slots.
+
+Until the user asks to start a given wave:
+
+- Do **not** begin product coding for that wave’s tasks
+- Do **not** auto-advance to the next wave when the previous one closes
+- Do **not** start wave N+1 because wave N finished, because clones exist, or because the plan says “next”
+- Do **ask again** before every wave, including wave-1 after materialize
+
+Record each “start wave-N” steer in `history/` + `worksession.txt`.
+
 ## Phases
 
 1. **Config** — fill `.eteller/workspace.config.md` (`REPO_URL`, `INTEGRATION_BRANCH`, branch naming). Clone folder = basename of `REPO_URL`. Refuse empty invention.
@@ -28,10 +47,11 @@ Reading base `CurrentTask/*AGENT_SPEC*` for later coding law is fine; treating i
    - After each material prompt/steer: `base/<repo>/.eteller/history/YYYYMMDDTHHMMSSZ.md` + update `worksession.txt` (see `memory/history.md`)
    Waves/tasks/branches must come from the user’s story (and naming criteria they set). Confirm ambiguous ids/names with the user rather than inventing.
 5. **Branches** — exact names the user dictates (match naming criteria). Create/push only after Plan is agreed.
-6. **Materialize** — `waves/wave-N/<task-id>/<repo>/` at root; seed clone `.eteller/` from `.eteller/templates/` if missing. Re-run bootstrap only after open tasks exist in orchestration.
-7. **Work** — code in that clone; follow **base** AGENT_SPEC; update clone `.eteller/progress.md` on milestones; commit on wave-task branch.
-8. **Close** — Reports → open PR → `state.md` closed. **Do not merge** unless user asks. Record the steer in base history + `worksession.txt`.
-9. **Refresh base** — after merge, pull base; refresh `worksession.txt`.
+6. **Materialize** — `waves/wave-N/<task-id>/<repo>/` at root; seed clone `.eteller/` from `.eteller/templates/` if missing. Re-run bootstrap only after open tasks exist in orchestration. Materialize ≠ start work.
+7. **STOP — ask before each wave** — after materialize (and after each wave completes), ask which wave to start; do not enter Work until the user names that wave.
+8. **Work** — only for the user-started wave: code in that clone; follow **base** AGENT_SPEC; update clone `.eteller/progress.md` on milestones; commit on wave-task branch.
+9. **Close** — Reports → open PR → `state.md` closed. **Do not merge** unless user asks. Record the steer in base history + `worksession.txt`. Then **STOP** and ask before the next wave.
+10. **Refresh base** — after merge, pull base; refresh `worksession.txt`.
 
 ## Models
 

@@ -27,6 +27,15 @@ AGENT_SPEC / CurrentTask PROMPTs are **not** a task backlog to invent waves from
 
 After cloning `base/<repo>/` (bootstrap phase **Base**): **STOP**. Ask the user for their **story** (what to achieve, scope, waves/tasks/branch names they want). Do not continue into plan, branch creation, wave materialization, or product coding until they answer.
 
+## Hard stop before each wave
+
+Do **not** start a wave until the user explicitly asks for that wave (e.g. “start wave-1” / “empezar oleada 2”).
+
+- Ask before wave-1 and before every later wave
+- Materializing clones does **not** start work
+- Finishing wave N does **not** start wave N+1 — ask again
+- Record each start-wave steer in base `history/` + `worksession.txt`
+
 ## Obligatory
 
 - One agent = one task slot; product edits only in that clone cwd
@@ -44,6 +53,8 @@ After cloning `base/<repo>/` (bootstrap phase **Base**): **STOP**. Ask the user 
 - Inventing waves, task ids, or branch names before the user gives their story
 - Auto-filling orchestration from CurrentTask PROMPTs / AGENT_SPEC maps / “next ticket numbers”
 - Creating/pushing task branches or materializing `waves/` before an agreed user story
+- Starting any wave’s product work without an explicit user request for that wave
+- Auto-advancing to the next wave when one closes
 - Auto-merging PRs
 - Implementing product features in the eteller framework tree
 - Cross-slot edits
