@@ -5,19 +5,36 @@ import path from 'node:path';
 export const prerender = false;
 
 function workspaceRoot(): string {
-  // board/ is one level under eteller root
-  return path.resolve(process.cwd(), '..');
+  // .eteller/board → workspace root is two levels up
+  return path.resolve(process.cwd(), '..', '..');
 }
 
-function readConfig(): { repoDir: string } {
-  const cfgPath = path.join(workspaceRoot(), 'workspace.config.md');
-  let repoDir = '';
+function etellerRoot(): string {
+  return path.join(workspaceRoot(), '.eteller');
+}
+
+function repoDirFromUrl(repoUrl: string): string {
+  let name = repoUrl.trim().replace(/\/+$/, '').replace(/\.git$/i, '');
+  name = path.basename(name);
+  return name;
+}
+
+function readConfig(): { repoUrl: string; repoDir: string; integration: string } {
+  const cfgPath = path.join(etellerRoot(), 'workspace.config.md');
+  let repoUrl = '';
+  let integration = '';
   if (fs.existsSync(cfgPath)) {
     const text = fs.readFileSync(cfgPath, 'utf8');
-    const m = text.match(/^REPO_DIR_NAME:\s*(.+)$/m);
-    if (m) repoDir = m[1].trim();
+    const u = text.match(/^REPO_URL:\s*(.+)$/m);
+    const i = text.match(/^INTEGRATION_BRANCH:\s*(.+)$/m);
+    if (u) repoUrl = u[1].trim();
+    if (i) integration = i[1].trim();
   }
-  return { repoDir };
+  return {
+    repoUrl,
+    integration,
+    repoDir: repoUrl ? repoDirFromUrl(repoUrl) : '',
+  };
 }
 
 function parseMeta(md: string): Record<string, string> {
@@ -58,12 +75,15 @@ export const GET: APIRoute = async () => {
   const wavesRoot = path.join(root, 'waves');
   const baseEteller = repoDir
     ? path.join(root, 'base', repoDir, '.eteller')
-    : path.join(root, 'base');
-
-  const orchestrationPath = path.join(baseEteller, 'orchestration.md');
-  const orchestration = fs.existsSync(orchestrationPath)
-    ? fs.readFileSync(orchestrationPath, 'utf8')
     : '';
+
+  const orchestrationPath = baseEteller
+    ? path.join(baseEteller, 'orchestration.md')
+    : '';
+  const orchestration =
+    orchestrationPath && fs.existsSync(orchestrationPath)
+      ? fs.readFileSync(orchestrationPath, 'utf8')
+      : '';
 
   const waves: {
     id: string;
@@ -81,8 +101,11 @@ export const GET: APIRoute = async () => {
 
   for (const waveId of listWaveDirs(wavesRoot)) {
     const wavePath = path.join(wavesRoot, waveId);
-    const planPath = path.join(baseEteller, 'waves', waveId, 'wave_plan.md');
-    const plan = fs.existsSync(planPath) ? fs.readFileSync(planPath, 'utf8') : '';
+    const planPath = baseEteller
+      ? path.join(baseEteller, 'waves', waveId, 'wave_plan.md')
+      : '';
+    const plan =
+      planPath && fs.existsSync(planPath) ? fs.readFileSync(planPath, 'utf8') : '';
 
     const taskIds = fs
       .readdirSync(wavePath, { withFileTypes: true })
@@ -98,7 +121,7 @@ export const GET: APIRoute = async () => {
         const candidate = path.join(taskParent, repoDir);
         if (fs.existsSync(candidate)) clonePath = candidate;
       }
-      if (!clonePath) {
+      if (!clonePath && fs.existsSync(taskParent)) {
         const kids = fs
           .readdirSync(taskParent, { withFileTypes: true })
           .filter((d) => d.isDirectory())

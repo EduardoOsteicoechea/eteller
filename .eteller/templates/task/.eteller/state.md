@@ -5,7 +5,7 @@
 | status | `pending` |
 | branch | `<branch>` |
 | wave | `wave-N` |
-| clone | `waves/wave-N/<task-id>/<REPO_DIR_NAME>/` |
+| clone | `waves/wave-N/<task-id>/<repo>/` |
 | finished | `false` |
 | pr_url | |
 | updated | |

@@ -1,15 +1,16 @@
 # Recreate base + wave-task clones for eteller.
-# Usage (from eteller root):
-#   .\scripts\bootstrap-clones.ps1
-# Requires filled workspace.config.md
-# Optional: reads base/<REPO_DIR_NAME>/.eteller/orchestration.md for open tasks
+# Usage (from workspace root):
+#   .\.eteller\scripts\bootstrap-clones.ps1
+# Requires filled .eteller/workspace.config.md
+# Clone folder name = basename of REPO_URL
 
 $ErrorActionPreference = 'Stop'
-$Root = Split-Path -Parent $PSScriptRoot
-$ConfigPath = Join-Path $Root 'workspace.config.md'
+$Eteller = Split-Path -Parent $PSScriptRoot
+$Root = Split-Path -Parent $Eteller
+$ConfigPath = Join-Path $Eteller 'workspace.config.md'
 
 if (-not (Test-Path $ConfigPath)) {
-    throw "Missing workspace.config.md — copy workspace.config.example.md and fill it in."
+    throw "Missing .eteller/workspace.config.md — copy workspace.config.example.md and fill it in."
 }
 
 function Get-ConfigValue([string]$key) {
@@ -18,15 +19,25 @@ function Get-ConfigValue([string]$key) {
     return $line.Matches[0].Groups[1].Value.Trim()
 }
 
+function Get-RepoDirName([string]$repoUrl) {
+    $name = $repoUrl.Trim().TrimEnd('/')
+    $name = $name -replace '\.git$', ''
+    $name = Split-Path -Leaf $name
+    if ([string]::IsNullOrWhiteSpace($name)) {
+        throw "Could not derive clone folder name from REPO_URL: $repoUrl"
+    }
+    return $name
+}
+
 $Repo = Get-ConfigValue 'REPO_URL'
 $Integration = Get-ConfigValue 'INTEGRATION_BRANCH'
-$RepoDir = Get-ConfigValue 'REPO_DIR_NAME'
+$RepoDir = Get-RepoDirName $Repo
 
-if ([string]::IsNullOrWhiteSpace($Repo) -or
-    [string]::IsNullOrWhiteSpace($Integration) -or
-    [string]::IsNullOrWhiteSpace($RepoDir)) {
-    throw "workspace.config.md must set REPO_URL, INTEGRATION_BRANCH, and REPO_DIR_NAME."
+if ([string]::IsNullOrWhiteSpace($Repo) -or [string]::IsNullOrWhiteSpace($Integration)) {
+    throw ".eteller/workspace.config.md must set REPO_URL and INTEGRATION_BRANCH."
 }
+
+Write-Host "REPO_DIR (from REPO_URL): $RepoDir"
 
 function Ensure-Clone([string]$parentDir, [string]$branch) {
     $target = Join-Path $parentDir $RepoDir
@@ -49,7 +60,7 @@ function Ensure-Clone([string]$parentDir, [string]$branch) {
 
 function Seed-TaskEteller([string]$clonePath, [string]$taskId, [string]$wave, [string]$branch) {
     $eteller = Join-Path $clonePath '.eteller'
-    $templates = Join-Path $Root 'templates\task\.eteller'
+    $templates = Join-Path $Eteller 'templates\task\.eteller'
     if (-not (Test-Path $eteller)) {
         New-Item -ItemType Directory -Force -Path $eteller | Out-Null
         Copy-Item (Join-Path $templates '*') $eteller -Force
@@ -57,7 +68,7 @@ function Seed-TaskEteller([string]$clonePath, [string]$taskId, [string]$wave, [s
             $p = Join-Path $eteller $name
             if (Test-Path $p) {
                 $text = Get-Content $p -Raw
-                $text = $text.Replace('<task-id>', $taskId).Replace('wave-N', $wave).Replace('<branch>', $branch).Replace('<REPO_DIR_NAME>', $RepoDir)
+                $text = $text.Replace('<task-id>', $taskId).Replace('wave-N', $wave).Replace('<branch>', $branch).Replace('<repo>', $RepoDir)
                 Set-Content -Path $p -Value $text -NoNewline
             }
         }
@@ -71,7 +82,7 @@ function Seed-TaskEteller([string]$clonePath, [string]$taskId, [string]$wave, [s
 function Seed-BaseEteller([string]$clonePath) {
     $eteller = Join-Path $clonePath '.eteller'
     if (-not (Test-Path $eteller)) {
-        $src = Join-Path $Root 'templates\base\.eteller'
+        $src = Join-Path $Eteller 'templates\base\.eteller'
         New-Item -ItemType Directory -Force -Path $eteller | Out-Null
         Copy-Item (Join-Path $src 'orchestration.md') $eteller -Force
         $wavesTpl = Join-Path $src 'waves'
@@ -81,12 +92,10 @@ function Seed-BaseEteller([string]$clonePath) {
     }
 }
 
-# Base
 $baseParent = Join-Path $Root 'base'
 $baseClone = Ensure-Clone $baseParent $Integration
 Seed-BaseEteller $baseClone
 
-# Open tasks from orchestration.md (simple table parser)
 $orch = Join-Path $baseClone '.eteller\orchestration.md'
 if (Test-Path $orch) {
     $rows = Get-Content $orch | Where-Object { $_ -match '^\|\s*[^|]+\s*\|\s*[^|]+\s*\|\s*wave-' }

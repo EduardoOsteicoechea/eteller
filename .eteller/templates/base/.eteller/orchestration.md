@@ -1,6 +1,6 @@
 # Orchestration — campaign index
 
-Coding law (read-only): `base/<REPO_DIR_NAME>/CurrentTask/*AGENT_SPEC*.md`
+Coding law (read-only): `base/<repo>/CurrentTask/*AGENT_SPEC*.md`
 
 ## Waves
 
@@ -12,7 +12,7 @@ Coding law (read-only): `base/<REPO_DIR_NAME>/CurrentTask/*AGENT_SPEC*.md`
 
 | id | branch | wave | depends_on | status | slot path |
 |----|--------|------|------------|--------|-----------|
-| <task-id> | <branch> | wave-1 | — | pending | `waves/wave-1/<task-id>/<REPO_DIR_NAME>/` |
+| <task-id> | <branch> | wave-1 | — | pending | `waves/wave-1/<task-id>/<repo>/` |
 
 ## Rules
 

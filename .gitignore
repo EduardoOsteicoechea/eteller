@@ -1,14 +1,14 @@
-# Local product binding
-workspace.config.md
+# Local product binding (framework-internal)
+.eteller/workspace.config.md
 
-# Product clones (separate git repos) — root only
+# Product clones at workspace root
 /base/
 /waves/
 
 # Board dependencies / build
-board/node_modules/
-board/dist/
-board/.astro/
+.eteller/board/node_modules/
+.eteller/board/dist/
+.eteller/board/.astro/
 
 # OS / editor
 .DS_Store

@@ -2,8 +2,8 @@
 
 **Wave:** wave-N  
 **Branch:** <branch>  
-**Clone cwd:** `waves/wave-N/<task-id>/<REPO_DIR_NAME>/`  
-**Coding law (absolute path — read-only):** `<workspace>/base/<REPO_DIR_NAME>/CurrentTask/*AGENT_SPEC*.md`  
+**Clone cwd:** `waves/wave-N/<task-id>/<repo>/`  
+**Coding law (absolute path — read-only):** `<workspace>/base/<repo>/CurrentTask/*AGENT_SPEC*.md`  
 **Do not** treat this clone’s `CurrentTask/*AGENT_SPEC*` as law.
 
 **Reports:** `Reports/<task-id>.txt` (update on completion)  

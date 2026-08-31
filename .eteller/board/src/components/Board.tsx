@@ -87,8 +87,8 @@ export default function Board() {
 
       {!error && data && data.waves.length === 0 && (
         <div className="empty">
-          No waves yet. Fill <code>workspace.config.md</code>, bootstrap base, write{' '}
-          <code>.eteller/orchestration.md</code>, then materialize <code>waves/</code>.
+          No waves yet. Fill <code>.eteller/workspace.config.md</code>, bootstrap base, write{' '}
+          campaign <code>.eteller/orchestration.md</code> on base, then materialize <code>waves/</code>.
         </div>
       )}
 

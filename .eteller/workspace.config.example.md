@@ -3,7 +3,6 @@
 
 REPO_URL: https://github.com/ORG/REPO.git
 INTEGRATION_BRANCH: <integration-branch>
-REPO_DIR_NAME: <clone-folder-name>
 
 ## Branch naming criteria
 
@@ -11,3 +10,4 @@ PATTERN: <fill>
 RULES:
 - Agents must not invent branch names when this section is empty.
 - Use the exact names and progression the user dictates when steering.
+- Clone directory name is always derived from REPO_URL (repo basename); do not set a separate name.
