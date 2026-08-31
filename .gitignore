@@ -1,9 +1,9 @@
 # Local product binding
 workspace.config.md
 
-# Product clones (separate git repos)
-base/
-waves/
+# Product clones (separate git repos) — root only
+/base/
+/waves/
 
 # Board dependencies / build
 board/node_modules/
