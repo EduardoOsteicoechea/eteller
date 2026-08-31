@@ -54,6 +54,18 @@ Update `approved`, `review`, `status` (`approved` or `awaiting_review`), `update
 
 Commit + push on the wave-task branch: `approved.md`, `progress.md`, `state.md`.
 
+## Chat summary (mandatory)
+
+After disk updates, the **human-facing** review summary in chat must be emitted inside a single fenced Markdown code block (copyable textbox):
+
+````
+```md
+<markdown summary: table of verdicts + blocking findings>
+```
+````
+
+Do not leave the verdict table only as loose prose outside that fence.
+
 ## Re-review
 
 If the implementer pushes fixes: set `approved: false` again, uncheck Code review if needed, until you re-approve.

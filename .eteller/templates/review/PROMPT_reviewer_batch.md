@@ -47,8 +47,18 @@ For **each** row in the table below:
 
 ## Done
 
-Reply with:
+**Chat output (mandatory):** put the entire review summary for the human inside a single fenced Markdown code block so the UI shows a copyable textbox:
+
+\`\`\`md
+…summary here…
+\`\`\`
+
+Inside that block include at least:
 
 | Task id | PR | approved | blocking count | one-line verdict |
+|---------|----|----------|----------------|------------------|
+| … | … | true/false | N | … |
 
-All listed `approved.md` files committed and pushed.
+Plus short blocking findings per task if any.
+
+Also: all listed `approved.md` / `progress.md` / `state.md` committed and pushed on their wave-task branches (disk work is separate from the chat textbox).
