@@ -33,10 +33,10 @@ $integrationClone = Join-Path $Root "integration\$RepoDir"
 $baseClone = Join-Path $Root "base\$RepoDir"
 
 if (-not (Test-Path (Join-Path $integrationClone '.git'))) {
-    throw "Missing integration clone: $integrationClone — run bootstrap-clones.ps1 first."
+    throw "Missing integration clone: $integrationClone - run bootstrap-clones.ps1 first."
 }
 if (-not (Test-Path (Join-Path $baseClone '.git'))) {
-    throw "Missing base clone: $baseClone — run bootstrap-clones.ps1 first."
+    throw "Missing base clone: $baseClone - run bootstrap-clones.ps1 first."
 }
 
 Write-Host "Pulling integration ($IntegrationBranch)..."
