@@ -107,6 +107,16 @@ body {
   box-shadow: 0 0 0 1px rgba(224, 161, 6, 0.18);
 }
 
+.card.ux-review-card {
+  border-color: #6a5a9a;
+  box-shadow: 0 0 0 1px rgba(156, 130, 220, 0.2);
+}
+
+.card.ux-ready-card {
+  border-color: #2a6f8f;
+  box-shadow: 0 0 0 1px rgba(61, 156, 240, 0.2);
+}
+
 .card.approved-card {
   border-color: #2a6f8f;
   box-shadow: 0 0 0 1px rgba(61, 156, 240, 0.2);
@@ -171,6 +181,18 @@ body {
 }
 
 .badge.approved {
+  color: #7ec8f5;
+  border-color: #2a5f8f;
+  background: #14304a;
+}
+
+.badge.awaiting_ux_review {
+  color: #c4b5f5;
+  border-color: #6a5a9a;
+  background: #2a2440;
+}
+
+.badge.ux_ready {
   color: #7ec8f5;
   border-color: #2a5f8f;
   background: #14304a;

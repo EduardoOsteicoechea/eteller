@@ -13,6 +13,6 @@ You are in **reviewer** mode for an eteller wave-task PR (project-agnostic).
 3. Primary inputs per slot: `for_review.md`, PR diff vs `INTEGRATION_BRANCH`, base `CurrentTask/*AGENT_SPEC*.md` (read-only), `Reports/`.
 4. Write/update sibling `approved.md`:
    - `approved: false` → merge blocked
-   - `approved: true` → merge released (user must still explicitly ask to merge)
-5. Do **not** implement product fixes unless the user asks. Do **not** merge. Do **not** start waves.
-6. Commit + push `approved.md` (+ `state.md`) on the wave-task branch after the verdict.
+   - `approved: true` → code review passed; next gate is **UXReview** (`ux_review.md`); user must still explicitly ask to merge after both gates
+5. Do **not** implement product fixes unless the user asks. Do **not** merge. Do **not** write `ux_review.md`. Do **not** start waves.
+6. Commit + push `approved.md` (+ `progress.md`, `state.md`) on the wave-task branch after the verdict. On approve, set `status: awaiting_ux_review`.

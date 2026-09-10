@@ -103,6 +103,8 @@ function mergeStatus(
   const progressStatus = (progressMeta.status || '').toLowerCase();
   const approved =
     (stateMeta.approved || progressMeta.approved || '').toLowerCase() === 'true';
+  const uxReady =
+    (stateMeta.ux_ready || progressMeta.ux_ready || '').toLowerCase() === 'true';
 
   // Terminal success on the board = merged only (not "closed" after PR open).
   if (stateStatus === 'merged' || progressStatus === 'merged') return 'merged';
@@ -111,7 +113,8 @@ function mergeStatus(
   }
   // Legacy: finished/closed without merge → still in flight toward merge.
   if (finished || stateStatus === 'closed' || progressStatus === 'closed') {
-    if (approved) return 'approved';
+    if (uxReady) return 'ux_ready';
+    if (approved) return 'awaiting_ux_review';
     if (stateMeta.pr_url || progressMeta.pr_status) return 'awaiting_review';
     return progressStatus === 'closed' ? 'in_progress' : stateStatus || 'in_progress';
   }
@@ -121,8 +124,18 @@ function mergeStatus(
     return progressStatus;
   }
 
+  if (stateStatus === 'ux_ready' || progressStatus === 'ux_ready' || uxReady) {
+    return 'ux_ready';
+  }
+  if (
+    stateStatus === 'awaiting_ux_review' ||
+    progressStatus === 'awaiting_ux_review'
+  ) {
+    return 'awaiting_ux_review';
+  }
+  // Legacy "approved" after code review → treat as waiting for UXReview.
   if (stateStatus === 'approved' || progressStatus === 'approved' || approved) {
-    return 'approved';
+    return uxReady ? 'ux_ready' : 'awaiting_ux_review';
   }
   if (stateStatus === 'awaiting_review' || progressStatus === 'awaiting_review') {
     return 'awaiting_review';
@@ -239,6 +252,7 @@ export const GET: APIRoute = async () => {
       if (stateMeta.pr_url) meta.pr_status = stateMeta.pr_url;
       else if (!meta.pr_status && progressMeta.pr_status) meta.pr_status = progressMeta.pr_status;
       if (stateMeta.approved) meta.approved = stateMeta.approved;
+      if (stateMeta.ux_ready) meta.ux_ready = stateMeta.ux_ready;
       if (stateMeta.review) meta.review = stateMeta.review;
 
       meta.percent = derivePercent(milestones, meta.status, meta.percent);

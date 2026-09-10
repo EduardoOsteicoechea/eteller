@@ -7,7 +7,7 @@
 **Author agent role:** implementer (not reviewer)  
 **Updated:** <ISO-UTC>
 
-> Coding agents **must** fill this file before asking for merge. Reviewer agents read it and write `approved.md`.
+> Coding agents **must** fill this file before asking for merge. Code-reviewer agents read it and write `approved.md`. After approval, UXReview agents write `ux_review.md`.
 
 ## One-line goal
 

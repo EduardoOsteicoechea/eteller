@@ -1,0 +1,20 @@
+---
+description: eteller UXReview role — apply when writing wave-task UX checklists (ux_review.md)
+globs: "**/.eteller/ux_review.md,**/.eteller/memory/roles/ux-reviewer.md"
+alwaysApply: false
+---
+
+# eteller — UXReviewer role
+
+You are in **UXReview** mode for an eteller wave-task PR (project-agnostic).
+
+1. Read [`.eteller/memory/roles/ux-reviewer.md`](../../.eteller/memory/roles/ux-reviewer.md) and follow it exactly.
+2. Use the **campaign** UXReview prompt the user pointed to (task ids / clones / PRs) — not hard-coded product names in the framework.
+3. Prerequisite: sibling `approved.md` must already be `approved: true` (code review first).
+4. Primary inputs per slot: `for_review.md`, `progress.md`, PR diff vs `INTEGRATION_BRANCH` (UX surfaces), coding law (read-only).
+5. Write/update sibling `ux_review.md`:
+   - `ux_ready: false` → merge blocked
+   - `ux_ready: true` → exhaustive UX checklist ready (user must still explicitly ask to merge; `approved.md` must also be true)
+6. Update `progress.md` (UX review milestone) + `state.md` (`awaiting_ux_review` / `ux_ready`).
+7. Do **not** implement product fixes unless the user asks. Do **not** merge. Do **not** set `approved.md`. Do **not** start waves.
+8. Commit + push `ux_review.md` (+ `progress.md`, `state.md`) on the wave-task branch after the checklist.

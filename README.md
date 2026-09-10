@@ -17,7 +17,7 @@ Framework wiring lives under **`.eteller/`**. Product clones are generated at th
 - Tracks campaign/wave/task state in product-owned `.eteller/` docs inside those clones
 - Serves a live progress board from `.eteller/board/`
 - Enforces a single coding law from `integration/` AGENT_SPEC (fallback `base/`)
-- **Code-review gate before merge:** implementer writes `for_review.md`; reviewer agents set `approved.md`
+- **Code-review + UXReview gates before merge:** implementer writes `for_review.md`; code-reviewer sets `approved.md`; ux-reviewer writes exhaustive `ux_review.md`; on merge, checklists roll up into `integration/.../ux_review/wave-N.md`
 
 The clone directory name is always the **repository basename** from `REPO_URL` (no separate config field).
 
@@ -64,12 +64,14 @@ integration/<repo>/          # live INTEGRATION_BRANCH
   CurrentTask/*AGENT_SPEC*
   .eteller/orchestration.md
   .eteller/waves/wave-N/wave_plan.md
+  .eteller/ux_review/wave-N.md   # rollup: all merged task UX + subtareas
   .eteller/history/
   .eteller/worksession.txt
 waves/wave-N/<task-id>/<repo>/
   .eteller/task.md|state.md|progress.md
   .eteller/for_review.md
   .eteller/approved.md
+  .eteller/ux_review.md
   Reports/<task-id>.txt
 ```
 
@@ -81,6 +83,6 @@ waves/wave-N/<task-id>/<repo>/
 - Promote **`base/`** only after wave close (user ask + script)
 - Coding criteria: `integration/` AGENT_SPEC (fallback base)
 - Each material work-session prompt/steer → `integration/.../.eteller/history/` + `worksession.txt`
-- Task complete: Reports → `for_review.md` → open PR → review → **merge only on ask + approved** → pull integration
+- Task complete: Reports → `for_review.md` → open PR → code review → **UXReview** → **merge only on ask + approved + ux_ready** → pull integration → append UX rollup
 - Framework changes under `.eteller/`: commit and push to the eteller remote
 - Never commit `base/`, `integration/`, or `waves/` into eteller

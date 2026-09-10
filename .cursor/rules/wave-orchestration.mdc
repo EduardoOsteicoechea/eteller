@@ -51,13 +51,14 @@ Do **not** refresh `base/` after merges. Ask the user after validation in `integ
 ## Obligatory
 
 - One agent = one task slot; product edits only in that clone cwd
-- Skip slots with `state.md` `finished: true` / `status: merged` (or `abandoned`); allow work on `awaiting_review` / `approved` for reviewers and merge
+- Skip slots with `state.md` `finished: true` / `status: merged` (or `abandoned`); allow work on `awaiting_review` / `awaiting_ux_review` / `ux_ready` / `approved` for reviewers, UXReview, and merge
 - Subagents: `model: "cursor-grok-4.5-high"`
-- Milestones in clone `.eteller/progress.md` include coding **and** `for_review` / open PR / code review / **merge**; **write after every segment**; board polls disk
-- A task is **not** complete until `status: merged` (PR merged). Do not set `percent: 100` / `finished: true` at PR open or review pass
-- On PR open: Reports → **`for_review.md`** → `approved.md` false → `awaiting_review` — **never auto-merge**
-- **Code review:** reviewer updates `approved.md` **and** `progress.md` (Code review milestone); then `status: approved` if pass
-- **Merge:** only if user asks **and** `approved: true`; pull **`integration/`** after merge — **not** `base/`
+- Milestones in clone `.eteller/progress.md` include coding **and** `for_review` / open PR / code review / **UXReview** / **merge**; **write after every segment**; board polls disk
+- A task is **not** complete until `status: merged` (PR merged). Do not set `percent: 100` / `finished: true` at PR open, code review, or UXReview
+- On PR open: Reports → **`for_review.md`** → `approved.md` false → `ux_review.md` `ux_ready: false` → `awaiting_review` — **never auto-merge**
+- **Code review:** reviewer updates `approved.md` **and** `progress.md` (Code review milestone); then `status: awaiting_ux_review` if pass
+- **UXReview:** ux-reviewer updates `ux_review.md` (exhaustive UX test checklist + subtareas) **and** `progress.md`; then `status: ux_ready` if `ux_ready: true`
+- **Merge:** only if user asks **and** `approved: true` **and** `ux_ready: true`; pull **`integration/`** after merge — **not** `base/`; append slot UX + subtareas into `integration/<repo>/.eteller/ux_review/wave-N.md`
 - **Work-session history:** `integration/<repo>/.eteller/history/` + `worksession.txt`; commit on **integration branch** from **`integration/`**. See `.eteller/memory/history.md`
 - Framework changes under `.eteller/` (+ root README / thin AGENTS / this rule): **commit and push** to eteller
 - Never commit `base/`, `integration/`, or `waves/` into eteller
@@ -72,7 +73,8 @@ Do **not** refresh `base/` after merges. Ask the user after validation in `integ
 - Auto-advancing to the next wave when one closes
 - Auto-merging PRs
 - Merging while `.eteller/approved.md` is missing or `approved: false`
-- Implementer setting `approved: true` on their own PR
+- Merging while `.eteller/ux_review.md` is missing or `ux_ready: false`
+- Implementer setting `approved: true` or `ux_ready: true` on their own PR
 - Updating **`base/`** mid-wave to absorb merges (use **`integration/`**)
 - Implementing product features in the eteller framework tree
 - Cross-slot edits

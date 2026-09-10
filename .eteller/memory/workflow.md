@@ -61,31 +61,33 @@ Record each “start wave-N” steer in `integration/` `history/` + `worksession
 6. **Materialize** — `waves/wave-N/<task-id>/<repo>/` at root; seed clone `.eteller/` from `.eteller/templates/` if missing. Re-run bootstrap only after open tasks exist in orchestration (read orchestration from **integration**). Materialize ≠ start work.
 7. **STOP — ask before each wave** — after materialize (and after each wave completes), ask which wave to start; do not enter Work until the user names that wave.
 8. **Work** — only for the user-started wave: code in that clone; follow coding law from **integration** AGENT_SPEC (fallback base). **After every milestone/segment**, update clone `.eteller/progress.md` (`[x]`, `percent`, `current_task`, `status`, `updated`) **before** the next segment so the live board can poll. Milestones include coding **and** later PR / review / merge. Commit on the wave-task branch.
-9. **Close (PR + review packet)** — Reports → `for_review.md` → `approved.md` starts `false` → open PR → `progress.md` + `state.md` = `awaiting_review` (check PR milestone; **percent &lt; 100**). **Do not merge.** Record steer in integration history + `worksession.txt`.
-10. **Code review (hard gate)** — user launches **reviewer** agents ([roles/reviewer.md](roles/reviewer.md)). Reviewer writes `approved.md` **and** updates `progress.md` (Code review milestone; `status: approved` if pass). Task still **not** complete on the board.
-11. **Merge** — only if user asks + `approved: true`. Merge into `INTEGRATION_BRANCH`. Pull **`integration/`** only. After merge: check Merge milestone → `status: merged`, `percent: 100`, `finished: true`. **Only then** the task is done on the board. **Do not** update `base/` yet.
-12. **Validate in integration** — builds, installer/IT smoke, analytics review, optional seed/HTML — all in **`integration/`**.
-13. **STOP — ask before promote base** — when the user confirms wave close/validation: promote `base` ← `integration`, then ask before next wave.
-14. **STOP — ask before next wave**
+9. **Close (PR + review packet)** — Reports → `for_review.md` → `approved.md` starts `false` → `ux_review.md` starts `ux_ready: false` → open PR → `progress.md` + `state.md` = `awaiting_review` (check PR milestone; **percent &lt; 100**). **Do not merge.** Record steer in integration history + `worksession.txt`.
+10. **Code review (hard gate)** — user launches **reviewer** agents ([roles/reviewer.md](roles/reviewer.md)). Reviewer writes `approved.md` **and** updates `progress.md` (Code review milestone; `status: awaiting_ux_review` if pass). Task still **not** complete on the board.
+11. **UXReview (hard gate)** — user launches **ux-reviewer** agents ([roles/ux-reviewer.md](roles/ux-reviewer.md)) **after** code approval. UX reviewer writes `ux_review.md` with an **exhaustive** UX test checklist (+ subtareas from `progress.md`) **and** updates `progress.md` (UX review milestone; `status: ux_ready` if `ux_ready: true`). Task still **not** complete.
+12. **Merge** — only if user asks + `approved: true` + `ux_ready: true`. Merge into `INTEGRATION_BRANCH`. Pull **`integration/`** only. After merge: check Merge milestone → `status: merged`, `percent: 100`, `finished: true`; **append** that slot’s UX checklist + subtareas into `integration/<repo>/.eteller/ux_review/wave-N.md` (so integration holds the full wave list as tasks land). **Only then** the task is done on the board. **Do not** update `base/` yet.
+13. **Validate in integration** — builds, installer/IT smoke, analytics review, **execute the wave UX rollup** in `integration/<repo>/.eteller/ux_review/wave-N.md`, optional seed/HTML — all in **`integration/`**.
+14. **STOP — ask before promote base** — when the user confirms wave close/validation: promote `base` ← `integration`, then ask before next wave.
+15. **STOP — ask before next wave**
 
 ## Models
 
-Task / reviewer subagents: always `model: "cursor-grok-4.5-high"`.
+Task / reviewer / ux-reviewer subagents: always `model: "cursor-grok-4.5-high"`.
 
 ## Roles
 
 | Role | When | Attitude source |
 |------|------|-----------------|
 | Orchestrator / implementer | Plan, code, Reports, `for_review.md` | `.eteller/AGENTS.md` + this workflow |
-| **Reviewer** | User sends agent to review a PR | [`.eteller/memory/roles/reviewer.md`](roles/reviewer.md) (+ Cursor rule `eteller-reviewer` when `for_review.md` / `approved.md` are in scope) |
+| **Reviewer** | User sends agent to **code-review** a PR | [`.eteller/memory/roles/reviewer.md`](roles/reviewer.md) (+ Cursor rule `eteller-reviewer` when `for_review.md` / `approved.md` are in scope) |
+| **UXReviewer** | User sends agent to **UXReview** after code approval | [`.eteller/memory/roles/ux-reviewer.md`](roles/ux-reviewer.md) (+ Cursor rule `eteller-ux-reviewer` when `ux_review.md` is in scope) |
 
-Reviewer agents must **not** code product features or merge. Implementers must **not** set `approved: true` on their own PR.  
-A task is **not** “ready/done” until **merged** — review pass only moves status to `approved`.  
+Reviewer / UXReviewer agents must **not** code product features or merge. Implementers must **not** set `approved: true` or `ux_ready: true` on their own PR.  
+A task is **not** “ready/done” until **merged** — code review → UXReview → merge.  
 Wave product tree is **not** “closed into base” until promote after validation.
 
 ## Commits
 
 - Framework (`.eteller/` wiring, root README/thin AGENTS/rules) → **eteller** remote
-- Clone `.eteller/progress|task|state|for_review|approved` → **wave-task branch**
-- Integration campaign docs / history / worksession / seed-HTML → **`integration/`** on **integration branch**
+- Clone `.eteller/progress|task|state|for_review|approved|ux_review` → **wave-task branch**
+- Integration campaign docs / history / worksession / UX rollup / seed-HTML → **`integration/`** on **integration branch**
 - Promote updates `base/` only after user close confirmation

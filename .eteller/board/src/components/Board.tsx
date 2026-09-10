@@ -28,7 +28,9 @@ const POLL_MS = 1500;
 function badgeClass(status: string) {
   const s = (status || 'idle').toLowerCase();
   if (s === 'merged') return 'merged';
-  if (s === 'approved') return 'approved';
+  if (s === 'ux_ready') return 'ux_ready';
+  if (s === 'awaiting_ux_review') return 'awaiting_ux_review';
+  if (s === 'approved') return 'awaiting_ux_review';
   if (s === 'awaiting_review') return 'awaiting_review';
   if (s === 'blocked' || s === 'blocked_client') return 'blocked';
   if (s === 'in_progress' || s === 'active' || s === 'ready_for_pr') return 'in_progress';
@@ -161,7 +163,10 @@ export default function Board() {
               const cardClass = [
                 merged ? 'merged-card' : '',
                 status === 'awaiting_review' ? 'review-card' : '',
-                status === 'approved' ? 'approved-card' : '',
+                status === 'awaiting_ux_review' || status === 'approved'
+                  ? 'ux-review-card'
+                  : '',
+                status === 'ux_ready' ? 'ux-ready-card' : '',
                 flashIds.has(task.id) ? 'flash' : '',
               ]
                 .filter(Boolean)
@@ -185,6 +190,7 @@ export default function Board() {
                   <div className="pct">
                     {percent}% · updated {task.meta.updated || '—'}
                     {task.meta.approved ? ` · approved=${task.meta.approved}` : ''}
+                    {task.meta.ux_ready ? ` · ux_ready=${task.meta.ux_ready}` : ''}
                   </div>
                   {task.meta.pr_status && (
                     <div className="pr-link">

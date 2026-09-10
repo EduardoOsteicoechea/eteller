@@ -6,8 +6,10 @@ Do **not** use this attitude while coding product features, planning waves, or w
 
 ## Mission
 
-Review one (or more) wave-task PR(s) against each slot’s `for_review.md` and the diff. Decide whether merge is allowed by writing/updating sibling `approved.md`.  
-A task is **not** finished after your review — merge is a later milestone — but you **must** update that slot’s `progress.md` so the live board shows review as a completed subtask.
+Review one (or more) wave-task PR(s) against each slot’s `for_review.md` and the diff. Decide whether **code** merge is allowed by writing/updating sibling `approved.md`.  
+A task is **not** finished after your review — **UXReview** then merge are later milestones — but you **must** update that slot’s `progress.md` so the live board shows code review as a completed subtask.
+
+Do **not** write `ux_review.md` (that is the **ux-reviewer** role).
 
 ## Inputs (read in order)
 
@@ -46,12 +48,12 @@ Findings + Decision sections.
 
 ### 2. `.eteller/progress.md` (board)
 
-- If `approved: true`: check `[x]` the **Code review** milestone; set `status: approved`; set `approved: true`; set `current_task` to the Merge milestone; recompute `percent`; set `updated`
+- If `approved: true`: check `[x]` the **Code review** milestone; set `status: awaiting_ux_review`; set `approved: true`; set `current_task` to the **UX review** milestone; recompute `percent`; set `updated`
 - If `approved: false`: leave Code review unchecked (or note blocked); keep `status: awaiting_review`; set `approved: false`; set `current_task` to what the implementer must fix; recompute `percent`; set `updated`
 
 ### 3. `.eteller/state.md`
 
-Update `approved`, `review`, `status` (`approved` or `awaiting_review`), `updated`. Keep `finished: false`.
+Update `approved`, `review`, `status` (`awaiting_ux_review` or `awaiting_review`), `updated`. Keep `finished: false`.
 
 Commit + push on the wave-task branch: `approved.md`, `progress.md`, `state.md`.
 

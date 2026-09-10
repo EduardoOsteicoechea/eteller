@@ -29,11 +29,14 @@ Framework wiring lives under workspace `.eteller/`. Product clones are generated
 
 Coding law for workers: prefer `integration/<repo>/CurrentTask/*AGENT_SPEC*.md` when `integration/` exists; else `base/...`. Do **not** treat wave-clone `CurrentTask/*AGENT_SPEC*` as law.
 
-Also read [`workflow.md`](workflow.md) (hard stops + **merge code-review gate**) and [`history.md`](history.md) (work-session recording).
+Also read [`workflow.md`](workflow.md) (hard stops + **merge code-review + UXReview gates**) and [`history.md`](history.md) (work-session recording).
 
-Reviewer-only attitude: [`roles/reviewer.md`](roles/reviewer.md) — load only when assigned to review a PR.  
-Agnostic batch prompt skeleton: [`../templates/review/PROMPT_reviewer_batch.md`](../templates/review/PROMPT_reviewer_batch.md).  
+Reviewer-only attitude: [`roles/reviewer.md`](roles/reviewer.md) — load only when assigned to code-review a PR.  
+UXReviewer-only attitude: [`roles/ux-reviewer.md`](roles/ux-reviewer.md) — load only when assigned to UXReview after code approval.  
+Agnostic batch prompt skeletons: [`../templates/review/PROMPT_reviewer_batch.md`](../templates/review/PROMPT_reviewer_batch.md), [`../templates/review/PROMPT_ux_reviewer_batch.md`](../templates/review/PROMPT_ux_reviewer_batch.md).  
 Filled campaign prompts live under `integration/<repo>/.eteller/prompts/` (product branch), not in the framework.
+
+After each wave-task merge, orchestrators append that slot’s UX checklist + subtareas into `integration/<repo>/.eteller/ux_review/wave-N.md` so integration holds the full wave list.
 
 ## Coding law
 

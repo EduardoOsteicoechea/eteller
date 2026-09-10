@@ -20,8 +20,10 @@ Do **not** invent waves or tasks. After base bootstrap, stop and ask the user fo
 
 ## Rules
 
-- Skip `closed` tasks
+- Skip `closed` / `merged` tasks
 - Never auto-merge PRs
+- Merge requires `approved: true` **and** `ux_ready: true`
+- After each task merge, append UX checklist + subtareas into `.eteller/ux_review/wave-N.md`
 - Status rolls up from task `state.md` / `progress.md`
-- Work-session prompt changes → `history/` + `worksession.txt` (beside this tree on base)
+- Work-session prompt changes → `history/` + `worksession.txt` (beside this tree on integration)
 - Task ids and branch names come from the user (and workspace naming criteria), never from agent invention
