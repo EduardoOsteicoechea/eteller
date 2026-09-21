@@ -35,6 +35,7 @@ Read, in this order:
 
 1. **After base + integration** — stop and ask for the user’s **story**. Do not invent tasks, create branches, fill orchestration with guesses, or materialize `waves/` until that story is given.
 2. **Before each wave** — stop and ask whether to start that wave. Do not code in wave slots, launch wave agents, or advance to the next wave until the user explicitly asks (e.g. “start wave-1”). Materialize ≠ permission to start work. Closing wave N does not start wave N+1.
+2b. **After wave coding finishes** — deliver a **copyable code-review prompt** (file under `integration/…/.eteller/prompts/` + paste in chat) for another agent; do not auto-start review. Same agent may review only if the user asks.
 3. **Before promote base** — after merges + validation in `integration/`, stop and ask before updating `base/`.
 
 On every material work-session prompt/steer change: append `history/YYYYMMDDTHHMMSSZ.md` and update `worksession.txt` under **`integration/`** (see [`memory/history.md`](memory/history.md)). Commit on the integration branch from that clone.

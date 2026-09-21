@@ -56,6 +56,7 @@ Do **not** refresh `base/` after merges. Ask the user after validation in `integ
 - Milestones in clone `.eteller/progress.md` include coding **and** `for_review` / open PR / code review / **UXReview** / **merge**; **write after every segment**; board polls disk
 - A task is **not** complete until `status: merged` (PR merged). Do not set `percent: 100` / `finished: true` at PR open, code review, or UXReview
 - On PR open: Reports → **`for_review.md`** → `approved.md` false → `ux_review.md` `ux_ready: false` → `awaiting_review` — **never auto-merge**
+- **After wave coding finishes** (all wave PRs `awaiting_review`, or single-slot if that was the ask): write `integration/<repo>/.eteller/prompts/PROMPT_reviewer_batch_wave-N_….md` and **deliver a copyable code-review prompt in chat** for another agent. Do **not** auto-start review. User may ask the same agent to review (“reviewá vos”); still use reviewer role — prefer a different agent when practical. Template: `.eteller/templates/PROMPT_reviewer_batch_wave-N.md`
 - **Code review:** reviewer updates `approved.md` **and** `progress.md` (Code review milestone); then `status: awaiting_ux_review` if pass
 - **UXReview:** ux-reviewer updates `ux_review.md` (exhaustive UX test checklist + subtareas) **and** `progress.md`; then `status: ux_ready` if `ux_ready: true`
 - **Merge:** only if user asks **and** `approved: true` **and** `ux_ready: true`; pull **`integration/`** after merge — **not** `base/`; append slot UX + subtareas into `integration/<repo>/.eteller/ux_review/wave-N.md`
