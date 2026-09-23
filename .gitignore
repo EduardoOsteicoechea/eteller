@@ -17,3 +17,7 @@ Thumbs.db
 *.log
 .env
 .env.*
+
+# Eduardo OS eReport connector (local sidecar)
+.ereport/
+
