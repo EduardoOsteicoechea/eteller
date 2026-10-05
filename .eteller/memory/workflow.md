@@ -65,18 +65,24 @@ Record each “start wave-N” steer in `integration/` `history/` + `worksession
 9b. **Deliver code-review prompt (mandatory when wave coding finishes)** — When **all** tasks of the user-started wave have open PRs in `awaiting_review` (or when the orchestrator would otherwise say “coding complete”):
     - Write/update `integration/<repo>/.eteller/prompts/PROMPT_reviewer_batch_wave-N_….md` from [`.eteller/templates/PROMPT_reviewer_batch_wave-N.md`](../templates/PROMPT_reviewer_batch_wave-N.md) (task ids, clone paths, PR URLs, integration branch, wave plan path).
     - In the **same chat turn**, give the user a **copyable** review prompt (fenced block or “open this file and paste”) so **another agent** can run as **reviewer**.
-    - Do **not** auto-start code review. Ask briefly: paste into another chat / agent, **or** say e.g. “reviewá vos” / “code-review wave-N aquí” if they want **this** agent to review (still load [roles/reviewer.md](roles/reviewer.md); prefer a different agent when practical).
+    - Do **not** auto-start code review **unless** [**autonomous wave**](workflows/autonomous-wave.md) is active for this wave.
+    - Default: ask briefly — paste into another chat / agent, **or** say e.g. “reviewá vos” / “code-review wave-N aquí” if they want **this** agent to review (still load [roles/reviewer.md](roles/reviewer.md); prefer a different agent when practical).
     - Same rule applies if a **single** task finishes and the user asked only for that slot: deliver a one-slot review prompt for that PR.
-10. **Code review (hard gate)** — user launches **reviewer** agents ([roles/reviewer.md](roles/reviewer.md)) using the delivered prompt (other agent **or** same chat if they ask). Reviewer writes `approved.md` **and** updates `progress.md` (Code review milestone; `status: awaiting_ux_review` if pass). Task still **not** complete on the board.
-11. **UXReview (hard gate)** — user launches **ux-reviewer** agents ([roles/ux-reviewer.md](roles/ux-reviewer.md)) **after** code approval. UX reviewer writes `ux_review.md` with an **exhaustive** UX test checklist (+ subtareas from `progress.md`) **and** updates `progress.md` (UX review milestone; `status: ux_ready` if `ux_ready: true`). Task still **not** complete.
-12. **Merge** — only if user asks + `approved: true` + `ux_ready: true`. Merge into `INTEGRATION_BRANCH`. Pull **`integration/`** only. After merge: check Merge milestone → `status: merged`, `percent: 100`, `finished: true`; **append** that slot’s UX checklist + subtareas into `integration/<repo>/.eteller/ux_review/wave-N.md` (so integration holds the full wave list as tasks land). **Only then** the task is done on the board. **Do not** update `base/` yet.
-13. **Validate in integration** — builds, installer/IT smoke, analytics review, **execute the wave UX rollup** in `integration/<repo>/.eteller/ux_review/wave-N.md`, optional seed/HTML — all in **`integration/`**.
+10. **Code review (hard gate)** — **reviewer** agents ([roles/reviewer.md](roles/reviewer.md)) using the delivered prompt (other agent, same chat if asked, **or** background Task under autonomous wave). Reviewer writes `approved.md` **and** updates `progress.md` (Code review milestone; `status: awaiting_ux_review` if pass). Task still **not** complete on the board.
+11. **UXReview (hard gate)** — **ux-reviewer** agents ([roles/ux-reviewer.md](roles/ux-reviewer.md)) **after** code approval (same launch options as code review). UX reviewer writes `ux_review.md` with an **exhaustive** UX test checklist (+ subtareas from `progress.md`) **and** updates `progress.md` (UX review milestone; `status: ux_ready` if `ux_ready: true`). Task still **not** complete.
+12. **Merge** — `approved: true` + `ux_ready: true`, and either the user asks **or** autonomous wave already authorized merge-on-pass for this wave. Merge into `INTEGRATION_BRANCH`. Pull **`integration/`** only. After merge: check Merge milestone → `status: merged`, `percent: 100`, `finished: true`; **append** that slot’s UX checklist + subtareas into `integration/<repo>/.eteller/ux_review/wave-N.md`. **Do not** update `base/` yet.
+13. **Validate in integration** — builds, installer/IT smoke, analytics review, **execute the wave UX rollup** in `integration/<repo>/.eteller/ux_review/wave-N.md`, optional seed/HTML — all in **`integration/`**. Under autonomous wave, when **all** wave slots are merged, run the Release/installer compile here and report the artifact path before asking to promote.
 14. **STOP — ask before promote base** — when the user confirms wave close/validation: promote `base` ← `integration`, then ask before next wave.
 15. **STOP — ask before next wave**
 
+### Opt-in: autonomous wave
+
+When the user explicitly enables it for a wave, follow [`workflows/autonomous-wave.md`](workflows/autonomous-wave.md) (chat textboxes + Terra review Tasks + merge-on-pass + integration Release build). Hard gates A/B/C and review/UX files still apply.
+
 ## Models
 
-Task / reviewer / ux-reviewer subagents: always `model: "cursor-grok-4.5-high"`.
+- Default (steered): task / reviewer / ux-reviewer subagents → `model: "cursor-grok-4.5-high"`.
+- Autonomous wave reviews (unless user overrides with a listed slug): reviewer / ux-reviewer → `model: "gpt-5.6-terra-medium"`; orchestrator stays in-chat.
 
 ## Roles
 

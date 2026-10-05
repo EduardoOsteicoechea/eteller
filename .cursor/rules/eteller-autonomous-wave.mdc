@@ -1,0 +1,36 @@
+---
+description: eteller autonomous wave mode — opt-in review/merge/compile pipeline
+alwaysApply: true
+---
+
+# Autonomous wave (opt-in)
+
+Full contract: [`.eteller/memory/workflows/autonomous-wave.md`](.eteller/memory/workflows/autonomous-wave.md).
+
+## When it applies
+
+Only after an **explicit** user steer for this wave/session (“autonomous wave”, “modo autónomo”, or start-wave that also says: review prompts in chat + launch review subagents + merge when reviews pass + compile/Setup for IT). Record the steer in integration `history/` + `worksession.txt`.
+
+Default eteller still applies until then (prompts only; no auto-review; no auto-merge).
+
+## Hard gates that never lift
+
+- Ask for **story** after base+integration
+- Ask before **each** wave start
+- Ask before **promote base**
+- Never start wave N+1 automatically
+- Never skip `approved` / `ux_ready` gates
+- Implementer never self-approves
+
+## While autonomous is on
+
+1. **Orchestrator** stays in the user chat; launch reviewer/UXReviewer as background `Task` subagents.
+2. Default review models: `gpt-5.6-terra-medium` (override only if user names another listed slug). Implementers default `cursor-grok-4.5-high`.
+3. Always write prompt files under `integration/<repo>/.eteller/prompts/` **and** paste a copyable fenced textbox in chat.
+4. On `approved: true` → launch UXReview the same way.
+5. If the steer included merge-on-pass → merge when both gates are true; pull **integration/**; rollup `ux_review/wave-N.md`.
+6. When **all** wave slots are merged → Release build / installer in **integration/**; report the artifact path; **stop** and ask before promote base / next wave.
+
+## Conflict merges
+
+Keep slot `.eteller/*` (ours). Combine product files so sibling wave features are not dropped.

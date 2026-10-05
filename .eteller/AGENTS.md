@@ -35,12 +35,16 @@ Read, in this order:
 
 1. **After base + integration** — stop and ask for the user’s **story**. Do not invent tasks, create branches, fill orchestration with guesses, or materialize `waves/` until that story is given.
 2. **Before each wave** — stop and ask whether to start that wave. Do not code in wave slots, launch wave agents, or advance to the next wave until the user explicitly asks (e.g. “start wave-1”). Materialize ≠ permission to start work. Closing wave N does not start wave N+1.
-2b. **After wave coding finishes** — deliver a **copyable code-review prompt** (file under `integration/…/.eteller/prompts/` + paste in chat) for another agent; do not auto-start review. Same agent may review only if the user asks.
+2b. **After wave coding finishes** — deliver a **copyable code-review prompt** (file under `integration/…/.eteller/prompts/` + paste in chat) for another agent; do not auto-start review **unless** the user enabled [**autonomous wave**](memory/workflows/autonomous-wave.md) for that wave. Same agent may review only if the user asks (default mode).
 3. **Before promote base** — after merges + validation in `integration/`, stop and ask before updating `base/`.
+
+### Autonomous wave (opt-in)
+
+When the user explicitly asks for autonomous wave on a started wave: orchestrator stays in chat; paste review/UX prompts as chat textboxes **and** launch reviewer/UXReviewer `Task` subagents (default review model `gpt-5.6-terra-medium`); merge on pass only if that steer authorized it; after all wave slots merge, Release-build in `integration/` and report the artifact; still ask before promote base / next wave. Full contract: [`memory/workflows/autonomous-wave.md`](memory/workflows/autonomous-wave.md).
 
 On every material work-session prompt/steer change: append `history/YYYYMMDDTHHMMSSZ.md` and update `worksession.txt` under **`integration/`** (see [`memory/history.md`](memory/history.md)). Commit on the integration branch from that clone.
 
-Never invent a second coding law. Never auto-merge wave-task PRs. Never treat mid-wave `base/` as the merge target.
+Never invent a second coding law. Never auto-merge wave-task PRs **outside** an authorized autonomous-wave merge-on-pass steer. Never treat mid-wave `base/` as the merge target.
 
 ## Merge gate (code review + UXReview)
 
@@ -49,7 +53,7 @@ Before any merge of a wave-task PR:
 1. Implementer wrote `.eteller/for_review.md` on the task branch
 2. A **reviewer**-role agent wrote `.eteller/approved.md` with `approved: true` **and** updated `progress.md` (Code review milestone → `status: awaiting_ux_review`)
 3. A **ux-reviewer**-role agent wrote `.eteller/ux_review.md` with `ux_ready: true` (exhaustive UX test steps + subtareas) **and** updated `progress.md` (UX review milestone → `status: ux_ready`)
-4. User explicitly asked to merge
+4. User explicitly asked to merge **or** autonomous wave already authorized merge-on-pass for this wave
 5. After merge: pull **`integration/`**; append that slot’s UX checklist + subtareas into `integration/<repo>/.eteller/ux_review/wave-N.md`; `progress.md` / `state.md` → `status: merged`, `percent: 100`, `finished: true`
 6. **Do not** update `base/` until user asks to close/promote after validation
 

@@ -31,9 +31,11 @@ Coding law for workers: prefer `integration/<repo>/CurrentTask/*AGENT_SPEC*.md` 
 
 Also read [`workflow.md`](workflow.md) (hard stops + **merge code-review + UXReview gates**) and [`history.md`](history.md) (work-session recording).
 
+**Opt-in mode:** [`workflows/autonomous-wave.md`](workflows/autonomous-wave.md) — orchestrator stays in chat; paste review prompts as textboxes; launch Terra review/UX Tasks; merge when gates pass (if authorized); Release build in `integration/` when the wave is fully merged. Still ask before each wave start and before promote base.
+
 Reviewer-only attitude: [`roles/reviewer.md`](roles/reviewer.md) — load only when assigned to code-review a PR.  
 UXReviewer-only attitude: [`roles/ux-reviewer.md`](roles/ux-reviewer.md) — load only when assigned to UXReview after code approval.  
-Agnostic batch prompt skeletons: [`../templates/review/PROMPT_reviewer_batch.md`](../templates/review/PROMPT_reviewer_batch.md), [`../templates/review/PROMPT_ux_reviewer_batch.md`](../templates/review/PROMPT_ux_reviewer_batch.md).  
+Agnostic batch prompt skeletons: [`../templates/review/PROMPT_reviewer_batch.md`](../templates/review/PROMPT_reviewer_batch.md), [`../templates/review/PROMPT_ux_reviewer_batch.md`](../templates/review/PROMPT_ux_reviewer_batch.md), [`../templates/PROMPT_autonomous_wave.md`](../templates/PROMPT_autonomous_wave.md).  
 Filled campaign prompts live under `integration/<repo>/.eteller/prompts/` (product branch), not in the framework.
 
 After each wave-task merge, orchestrators append that slot’s UX checklist + subtareas into `integration/<repo>/.eteller/ux_review/wave-N.md` so integration holds the full wave list.
